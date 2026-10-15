@@ -97,6 +97,9 @@ window.GOODSIDE_I18N = {
     call: "Tawagan",
     sms: "I-text",
     followFb: "Sundan kami sa Facebook",
+    terms: "Mga Tuntunin",
+    privacy: "Privacy",
+    agreePost: "Sa pag-post, sang-ayon ka sa aming",
     linkCopied: "Nakopya ang link!",
     shareText: "Tingnan ito sa Good Side:"
   },
@@ -196,6 +199,9 @@ window.GOODSIDE_I18N = {
     call: "Call",
     sms: "Text",
     followFb: "Follow us on Facebook",
+    terms: "Terms of Use",
+    privacy: "Privacy Policy",
+    agreePost: "By posting, you agree to our",
     linkCopied: "Link copied!",
     shareText: "Check this out on Good Side:"
   }
