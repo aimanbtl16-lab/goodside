@@ -13,7 +13,7 @@ Ce dossier est le vrai site. Sans configuration, il tourne en mode démo avec le
 | `listings.js` | Les annonces d'exemple du mode démo |
 | `supabase/schema.sql` | La base de données à créer une seule fois |
 
-> **État au 15 octobre 2026** : les étapes 1 et 2 sont faites. La base est installée sur le projet Supabase « Goodside Projet » (serveur de Singapour, le plus proche des Philippines) et `config.js` est rempli. Il reste l'étape 3 (mise en ligne) et l'étape 4.
+> **État au 15 octobre 2026** : le site est en ligne sur https://goodside-kappa.vercel.app (Vercel, mis à jour automatiquement à chaque envoi sur `main`), branché au projet Supabase « Goodside Projet » (serveur de Singapour, le plus proche des Philippines). Restent l'étape 4 (réglages de connexion) et l'étape 5.
 
 ## Étape 1 : créer la base dans Supabase (5 minutes)
 
@@ -71,7 +71,7 @@ Un vendeur ne peut pas s'offrir ces options lui-même : la base refuse. Plus tar
 ## Partage sur Facebook, Messenger et TikTok
 
 - Chaque annonce a un bouton « I-share » et « I-share sa Facebook ». Le lien ouvre directement l'annonce (adresse se terminant par `#l-42`).
-- `og-image.png` est l'image d'aperçu affichée quand on partage le site. Dans `index.html`, les balises `og:` utilisent `https://goodside.ph/` : remplace cette adresse si le domaine final est différent.
+- `og-image.png` est l'image d'aperçu affichée quand on partage le site. Dans `index.html`, les balises `og:` utilisent `https://goodside-kappa.vercel.app/` : à remplacer quand le domaine goodside.ph sera branché.
 
 ## Ce qui a été vérifié
 
