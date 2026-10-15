@@ -150,9 +150,15 @@
 
     remove: function (id) {
       if (!client) return Promise.resolve({ ok: true });
-      return client.from("listings").delete().eq("id", Number(id)).then(function (res) {
+      var paths = [];
+      return client.from("listings").select("photo_paths").eq("id", Number(id)).maybeSingle().then(function (got) {
+        paths = (got.data && got.data.photo_paths) || [];
+        return client.from("listings").delete().eq("id", Number(id));
+      }).then(function (res) {
         if (res.error) throw fail("delete", res.error);
-        return { ok: true };
+        // Remove the listing's photos too; a failure here never blocks the delete
+        if (!paths.length) return { ok: true };
+        return client.storage.from(BUCKET).remove(paths).then(function () { return { ok: true }; }, function () { return { ok: true }; });
       });
     },
 
