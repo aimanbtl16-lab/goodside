@@ -306,6 +306,10 @@ textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3
 
 footer { border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
 footer .wrap { padding-block: 20px 96px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+.fb-follow { display: inline-flex; align-items: center; gap: 6px; color: inherit; font-weight: 700; text-decoration: none; }
+.fb-follow[hidden] { display: none; }
+.fb-follow svg { width: 16px; height: 16px; }
+.contact-reveal + .share-row { margin-top: 10px; }
 .made { display: inline-flex; align-items: center; gap: 8px; }
 .mini-flag { width: 24px; height: 12px; border-radius: 2px; flex: none; }
 
@@ -459,6 +463,7 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
     </svg>
     <span data-i18n="madeFor"></span>
   </span>
+  <a id="fbPageLink" class="fb-follow" target="_blank" rel="noopener" hidden></a>
 </div></footer>
 
 <button class="btn-post fab" type="button" data-open-post>
@@ -503,7 +508,7 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
     </div>
     <div class="field">
       <label for="fContact" data-i18n="fieldContact"></label>
-      <input id="fContact" type="tel" data-i18n-ph="fieldContactPh" maxlength="40">
+      <input id="fContact" type="text" data-i18n-ph="fieldContactPh" maxlength="40" autocomplete="tel">
     </div>
     <p class="error" id="fError" hidden></p>
     <p class="note" id="demoNote" data-i18n="demoNote"></p>
@@ -569,8 +574,25 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
   }
   var PIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>';
   var HEART = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-9-9.4A4.8 4.8 0 0 1 12 7a4.8 4.8 0 0 1 9 3.6C19.5 15.4 12 20 12 20z"/></svg>';
+  var FB = '<svg viewBox="0 0 24 24" fill="#1877F2" aria-hidden="true"><path d="M24 12a12 12 0 1 0-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v2.9h-1.5c-1.5 0-2 .9-2 1.9V12h3.4l-.5 3.5h-2.9v8.4A12 12 0 0 0 24 12z"/></svg>';
+  var MSG = '<svg viewBox="0 0 24 24" fill="#0084FF" aria-hidden="true"><path d="M12 2C6.4 2 2 6.1 2 11.7c0 2.9 1.2 5.5 3.2 7.2V22l3-1.6c.9.2 1.8.4 2.8.4 5.6 0 10-4.1 10-9.7S17.6 2 12 2zm1 13l-2.5-2.7L5.6 15l5.4-5.7 2.6 2.7 4.8-2.7L13 15z"/></svg>';
   var SHARE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/></svg>';
-  function listingUrl(id) { return location.origin + location.pathname + "#l-" + id; }
+  // Live site: /l/123 shows the listing's photo and price when shared on Facebook (api/l.js)
+  function listingUrl(id) { return live() ? location.origin + "/l/" + id : location.origin + location.pathname + "#l-" + id; }
+  var MOBILE = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  // Turn the seller's contact into tap-to-call, text, Viber or Messenger links
+  function contactLinks(v, L) {
+    var fb = /(?:m\.me|facebook\.com|fb\.com)\/(?:profile\.php\?id=)?([\w.\-]+)/i.exec(v);
+    if (fb) return [{ href: "https://m.me/" + fb[1], label: L.msgMessenger }];
+    var num = v.replace(/[^\d+]/g, "");
+    if (!/^\+?\d{10,13}$/.test(num)) return [];
+    var intl = num.charAt(0) === "+" ? num : /^0\d{10}$/.test(num) ? "+63" + num.slice(1) : /^63\d{10}$/.test(num) ? "+" + num : num;
+    return [
+      { href: "tel:" + num, label: L.call },
+      { href: "sms:" + num, label: L.sms },
+      { href: "viber://chat?number=" + encodeURIComponent(intl), label: "Viber" }
+    ];
+  }
   var FLAG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4h11l-1.5 4L16 12H5"/></svg>';
 
   var state = { lang: "tl", cat: "all", city: "all", q: "", saved: {} };
@@ -606,6 +628,8 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
     unitSel.innerHTML = UNITS.map(function (u) { return '<option value="' + u[0] + '">' + esc(L[u[1]]) + "</option>"; }).join("");
     unitSel.value = curUnit;
     document.getElementById("footerText").textContent = live() ? L.footerLive : L.footer;
+    var fbPage = (window.GOODSIDE_CONFIG || {}).facebookPage, fbLink = document.getElementById("fbPageLink");
+    if (fbPage) { fbLink.href = fbPage; fbLink.innerHTML = FB + esc(L.followFb); fbLink.hidden = false; }
     document.getElementById("demoNote").hidden = live();
     renderAccount();
   }
@@ -754,7 +778,8 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
         '<button type="button" class="btn-report" id="reportBtn">' + FLAG + esc(L.report) + "</button>" +
         (contactShown === null ? '<button type="button" class="btn-post" id="contactBtn">' + esc(L.contact) + "</button>" : "") +
         "</div>" +
-        (contactShown !== null ? (contactShown ? '<p class="contact-reveal"><span>' + esc(L.contactLabel) + "</span>" + esc(contactShown) + "</p>" : '<p class="note">' + esc(L.noContact) + "</p>") : "");
+        (contactShown !== null ? (contactShown ? '<p class="contact-reveal"><span>' + esc(L.contactLabel) + "</span>" + esc(contactShown) + "</p>" +
+          '<div class="share-row">' + contactLinks(contactShown, L).map(function (l) { return '<a class="btn-share"' + (/^https:/.test(l.href) ? ' target="_blank" rel="noopener"' : "") + ' href="' + esc(l.href) + '">' + esc(l.label) + "</a>"; }).join("") + "</div>" : '<p class="note">' + esc(L.noContact) + "</p>") : "");
     }
     document.getElementById("closeDetail").setAttribute("aria-label", L.close);
     document.getElementById("detailBody").innerHTML =
@@ -766,7 +791,8 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
         '<p class="desc">' + esc(desc || L.noDesc) + "</p>" +
         '<div class="share-row">' +
           '<button type="button" class="btn-share" id="shareBtn">' + SHARE + esc(L.share) + "</button>" +
-          '<a class="btn-share" id="shareFb" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(listingUrl(it.id)) + '">' + esc(L.shareFb) + "</a>" +
+          '<a class="btn-share" id="shareFb" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(listingUrl(it.id)) + '">' + FB + esc(L.shareFb) + "</a>" +
+          (MOBILE ? '<a class="btn-share" href="fb-messenger://share/?link=' + encodeURIComponent(listingUrl(it.id)) + '">' + MSG + esc(L.shareMessenger) + "</a>" : "") +
         "</div>" +
         '<div class="safety"><b>' + esc(L.safetyTitle) + "</b><ul>" + L.safety.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div>" +
         actions +
@@ -798,7 +824,7 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
   }
   function doShare() {
     var it = findListing(openId); if (!it) return;
-    var url = listingUrl(it.id), text = t().shareText + " " + (it.title[state.lang] || it.title.tl);
+    var url = listingUrl(it.id), text = t().shareText + " " + (it.title[state.lang] || it.title.tl) + " · " + money.format(it.price);
     if (navigator.share) {
       navigator.share({ title: "Good Side", text: text, url: url }).catch(function () {});
       return;
