@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="fil">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Libre ang pag-post sa Good Side. I-angat ₱49, Tampok ₱149 sa 7 araw, bayad sa GCash.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Good Side">
+<meta property="og:title" content="Presyo · Good Side">
+<meta property="og:description" content="Libre ang pag-post. I-angat ₱49, Tampok ₱149 sa 7 araw.">
+<meta property="og:url" content="https://www.goodsideph.com/presyo.html">
+<meta property="og:image" content="https://www.goodsideph.com/og-image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,700&display=swap">
+<style>
+/* Layout: one reading column; back link and language switch, title, three price cards, how to pay, safety note */
+:root {
+  --bg: #FBFDFD; --surface: #FFFFFF; --fg: #1A2B33; --muted: #627580; --line: #E3EDEF;
+  --accent: #14A99E; --accent-strong: #0C8077; --accent-soft: #E8F8F6; --price: #0C8077;
+  --ph-blue: #0038A8; --ph-red: #CE1126; --ph-yellow: #FCD116; --ph-yellow-soft: #FFF8DA; --ph-red-soft: #FDECEE;
+  --shadow: 0 1px 2px rgba(20, 60, 80, .05), 0 6px 18px rgba(20, 60, 80, .05);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E1716; --surface: #15211F; --fg: #E6F0EE; --muted: #9AB0AC; --line: #263532;
+    --accent: #2FB8AB; --accent-strong: #5CD0C4; --accent-soft: #173A36; --price: #5CD0C4;
+    --ph-blue: #5B8DEF; --ph-red: #F0566B; --ph-yellow-soft: #3A3317; --ph-red-soft: #3A1C22;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E1716; --surface: #15211F; --fg: #E6F0EE; --muted: #9AB0AC; --line: #263532;
+  --accent: #2FB8AB; --accent-strong: #5CD0C4; --accent-soft: #173A36; --price: #5CD0C4;
+  --ph-blue: #5B8DEF; --ph-red: #F0566B; --ph-yellow-soft: #3A3317; --ph-red-soft: #3A1C22;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.55 "Nunito Sans", system-ui, -apple-system, sans-serif; }
+main {
+  max-width: 760px; margin: 0 auto;
+  padding: 20px max(16px, env(safe-area-inset-right, 0px)) 64px max(16px, env(safe-area-inset-left, 0px));
+  display: flex; flex-direction: column; gap: 22px;
+}
+a { color: var(--accent-strong); }
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.back { font-weight: 700; text-decoration: none; }
+.lang { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--surface); }
+.lang button { border: 0; background: transparent; border-radius: 999px; padding: 6px 12px; cursor: pointer; font: 700 13px "Nunito Sans", system-ui, sans-serif; letter-spacing: .04em; color: var(--muted); }
+.lang button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-strong); }
+h1, h2 { font-family: Outfit, system-ui, sans-serif; line-height: 1.2; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(28px, 6vw, 36px); }
+h2 { font-size: 21px; }
+.lead { margin: 6px 0 0; color: var(--muted); font-size: 17px; }
+
+.plans { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); }
+.plan { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 6px; }
+.plan .name { font-weight: 700; display: flex; align-items: center; gap: 8px; }
+.plan .amount { font-family: Outfit, system-ui, sans-serif; font-weight: 700; font-size: 30px; color: var(--price); font-variant-numeric: tabular-nums; line-height: 1.1; }
+.plan .amount small { font: 600 14px "Nunito Sans", system-ui, sans-serif; color: var(--muted); }
+.plan p { margin: 0; color: var(--muted); font-size: 15px; }
+.nb { white-space: nowrap; }
+
+.how { display: flex; flex-direction: column; gap: 10px; }
+.how ol { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 6px; }
+.code { font-weight: 700; font-variant-numeric: tabular-nums; background: var(--accent-soft); color: var(--accent-strong); padding: 1px 6px; border-radius: 6px; white-space: nowrap; }
+.warn { margin: 0; padding: 12px 14px; border-radius: 12px; background: var(--ph-red-soft); border-left: 4px solid var(--ph-red); }
+.small { margin: 0; color: var(--muted); font-size: 15px; }
+footer { color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); padding-top: 16px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+<title>Presyo · Good Side</title>
+</head>
+<body>
+<main>
+  <div class="top">
+    <a class="back" href="/">← Good Side</a>
+    <div class="lang" role="group" aria-label="Wika / Language">
+      <button type="button" data-lang="tl">TL</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+  </div>
+
+  <header>
+    <h1 data-t="title"></h1>
+    <p class="lead" data-t="lead"></p>
+  </header>
+
+  <section class="plans" aria-labelledby="plansTitle">
+    <h2 id="plansTitle" data-t="plansTitle" hidden></h2>
+    <div class="plan">
+      <div class="name" data-t="freeName"></div>
+      <div class="amount" data-t="freeAmount"></div>
+      <p data-t="freeDesc"></p>
+    </div>
+    <div class="plan">
+      <div class="name" data-t="bumpName"></div>
+      <div class="amount" data-price="bump"></div>
+      <p data-t="bumpDesc"></p>
+    </div>
+    <div class="plan">
+      <div class="name" data-t="featureName"></div>
+      <div class="amount"><span data-price="feature"></span> <small data-t="per7"></small></div>
+      <p data-t="featureDesc"></p>
+    </div>
+  </section>
+
+  <section class="how">
+    <h2 data-t="howTitle"></h2>
+    <ol>
+      <li data-t="how1"></li>
+      <li data-t="how2" data-html></li>
+      <li data-t="how3" data-html></li>
+      <li data-t="how4"></li>
+    </ol>
+  </section>
+
+  <p class="warn" data-t="warn"></p>
+  <p class="small" data-t="refund"></p>
+  <p class="small" data-t="noGuarantee"></p>
+
+  <footer><a href="/terms.html" data-t="terms"></a> · <a href="/privacy.html" data-t="privacy"></a></footer>
+</main>
+
+<script src="config.js"></script>
+<script>
+(function () {
+  var prices = Object.assign({ bump: 49, feature: 149 }, (window.GOODSIDE_CONFIG || {}).prices || {});
+  var T = {
+    tl: {
+      htmlLang: "fil",
+      title: "Presyo",
+      lead: "Libre ang pag-post. Magbayad lang kung gusto mong mas maraming makakita ng listing mo.",
+      plansTitle: "Mga option",
+      freeName: "Pag-post", freeAmount: "Libre",
+      freeDesc: "Hanggang 10 listing kada araw, may larawan at kontak.",
+      bumpName: "I-angat",
+      bumpDesc: "Ibabalik ang listing mo sa itaas ng listahan, parang bagong post.",
+      featureName: "Tampok", per7: "/ 7 araw",
+      featureDesc: "Dilaw na badge at nasa unahan ng listahan sa loob ng 7 araw. Inaangat din ito.",
+      howTitle: "Paano magbayad",
+      how1: "Mag-login at buksan ang sarili mong listing.",
+      how2: "Sa \"Palakasin ang listing mo\", piliin ang <span class=\"nb\">I-angat</span> o Tampok.",
+      how3: "Ipadala ang bayad sa GCash sa numerong nakalagay doon, at ilagay ang code (hal. <span class=\"code\">GS-42-T</span>) sa Message.",
+      how4: "I-a-activate namin pagkatanggap ng bayad, sa loob ng 24 oras.",
+      warn: "Sa sarili mong listing lang sa goodsideph.com humihingi ng bayad ang Good Side. Hindi kami humihingi ng bayad sa Messenger, text o tawag.",
+      refund: "Kung hindi namin ma-activate ang option (hal. natanggal ang listing), ibabalik namin ang bayad mo sa GCash.",
+      noGuarantee: "Nakakatulong ang option para mas makita ang listing, pero hindi nito ginagarantiya ang benta.",
+      terms: "Mga Tuntunin", privacy: "Privacy"
+    },
+    en: {
+      htmlLang: "en",
+      title: "Prices",
+      lead: "Posting is free. Pay only if you want more people to see your listing.",
+      plansTitle: "Options",
+      freeName: "Posting", freeAmount: "Free",
+      freeDesc: "Up to 10 listings a day, with photos and your contact.",
+      bumpName: "Bump",
+      bumpDesc: "Moves your listing back to the top of the list, like a new post.",
+      featureName: "Featured", per7: "/ 7 days",
+      featureDesc: "Yellow badge and shown first in the list for 7 days. It is bumped too.",
+      howTitle: "How to pay",
+      how1: "Log in and open your own listing.",
+      how2: "Under \"Boost your listing\", choose Bump or Featured.",
+      how3: "Send the payment with GCash to the number shown there, and type the code (e.g. <span class=\"code\">GS-42-T</span>) in Message.",
+      how4: "We turn the option on once your payment arrives, within 24 hours.",
+      warn: "Good Side only asks for payment inside your own listing on goodsideph.com. We never ask for payment on Messenger, by text or by phone call.",
+      refund: "If we cannot turn the option on (for example, the listing was removed), we send your money back by GCash.",
+      noGuarantee: "An option helps more people see your listing, but it does not guarantee a sale.",
+      terms: "Terms of Use", privacy: "Privacy Policy"
+    }
+  };
+  var money = new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP", maximumFractionDigits: 0 });
+  var lang = "tl";
+  try { var saved = localStorage.getItem("goodside-lang"); if (T[saved]) lang = saved; } catch (e) {}
+
+  function render() {
+    var L = T[lang];
+    document.documentElement.lang = L.htmlLang;
+    document.querySelectorAll("[data-t]").forEach(function (el) {
+      var v = L[el.getAttribute("data-t")];
+      if (el.hasAttribute("data-html")) el.innerHTML = v; else el.textContent = v;
+    });
+    document.querySelectorAll("[data-price]").forEach(function (el) { el.textContent = money.format(prices[el.getAttribute("data-price")]); });
+    document.querySelectorAll("[data-lang]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-lang") === lang)); });
+  }
+  document.querySelector(".lang").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-lang]"); if (!b) return;
+    lang = b.getAttribute("data-lang");
+    try { localStorage.setItem("goodside-lang", lang); } catch (err) {}
+    render();
+  });
+  render();
+})();
+</script>
+</body>
+</html>

@@ -362,6 +362,26 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
 .btn-fb svg { width: 20px; height: 20px; flex: none; }
 .btn-fb[disabled], .btn-link.small[disabled] { opacity: .6; cursor: progress; }
 
+/* Paid options: the seller picks I-angat or Tampok, then sees the GCash steps with a code */
+.boost { border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.boost-head b { display: block; font-family: var(--font-display); font-size: 17px; }
+.boost-head span { color: var(--muted); font-size: 14px; }
+.boost-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.boost-opt { text-align: left; border: 1px solid var(--line); background: var(--bg); border-radius: 12px; padding: 10px 12px; cursor: pointer; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.boost-opt:hover { border-color: var(--accent); }
+.boost-opt[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent); }
+.boost-opt .bn { font-weight: 700; }
+.boost-opt .bp { font-family: var(--font-display); font-weight: 700; font-size: 20px; color: var(--price); font-variant-numeric: tabular-nums; }
+.boost-opt .bd { font-size: 13px; color: var(--muted); line-height: 1.35; }
+.feat-until { margin: 0; padding: 8px 12px; border-radius: 10px; background: var(--ph-yellow-soft); font-weight: 700; font-size: 14px; }
+.pay-steps { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+.pay-val { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
+.pay-val b { font-size: 17px; font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+.pay-val small { color: var(--muted); font-size: 13px; }
+.btn-copy { border: 0; background: var(--accent-soft); color: var(--accent-strong); border-radius: 8px; padding: 4px 10px; font-weight: 700; font-size: 13px; cursor: pointer; }
+.admin-box { border: 1px dashed var(--ph-blue); background: var(--ph-blue-soft); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+.admin-box .btn-ghost { background: var(--surface); }
+
 .toast {
   position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
   background: var(--fg); color: var(--bg); padding: 12px 18px; border-radius: 999px; font-weight: 700; z-index: 50;
@@ -485,7 +505,7 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
     <span data-i18n="madeFor"></span>
   </span>
   <a id="fbPageLink" class="fb-follow" target="_blank" rel="noopener" hidden></a>
-  <span class="legal-links"><a href="/terms.html" data-i18n="terms"></a> · <a href="/privacy.html" data-i18n="privacy"></a></span>
+  <span class="legal-links"><a href="/presyo.html" data-i18n="prices"></a> · <a href="/terms.html" data-i18n="terms"></a> · <a href="/privacy.html" data-i18n="privacy"></a></span>
 </div></footer>
 
 <button class="btn-post fab" type="button" data-open-post>
@@ -741,7 +761,9 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
       return;
     }
     var q = state.q.trim().toLowerCase();
+    var code = codeMatch(q);
     var shown = listings.filter(function (it) {
+      if (code) return String(it.id) === code[1];
       if (state.cat !== "all" && it.cat !== state.cat) return false;
       if (state.city !== "all" && it.loc !== state.city) return false;
       if (!q) return true;
@@ -903,14 +925,69 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
   function authChanged() {
     renderAccount();
     if (api.user() && loginDlg.open) loginDlg.close();
-    load().then(function () {
+    refreshAdmin().then(load).then(function () {
       if (api.user() && pendingAction) { var a = pendingAction; pendingAction = null; a(); }
     });
   }
 
+  // Paid options (I-angat, Tampok): the seller pays by GCash with a code, then the admin turns the option on
+  var CFG = window.GOODSIDE_CONFIG || {};
+  var PRICES = Object.assign({ bump: 49, feature: 149 }, CFG.prices || {});
+  var GCASH = CFG.gcash || {};
+  var isAdmin = false;
+  function refreshAdmin() {
+    return api.isAdmin().catch(function () { return false; }).then(function (v) { isAdmin = v; });
+  }
+  // GS-42-A = I-angat for listing 42, GS-42-T = Tampok. The seller types it in the GCash message.
+  function boostCode(id, kind) { return "GS-" + id + "-" + (kind === "feature" ? "T" : "A"); }
+  function codeMatch(q) { return /^gs-?(\d+)(?:-[at])?$/i.exec(String(q || "").trim()); }
+  function fmtUntil(ts, locale) {
+    try { return new Intl.DateTimeFormat(locale || t().dateLocale, { month: "short", day: "numeric" }).format(new Date(ts)); }
+    catch (e) { return String(ts).slice(0, 10); }
+  }
+  function copyBtn(value) { return '<button type="button" class="btn-copy" data-copy="' + esc(value) + '">' + esc(t().copy) + "</button>"; }
+  function boostHtml(it, L) {
+    var opts = [["bump", L.bumpName, L.bumpDesc], ["feature", L.featureName, L.featureDesc]];
+    var h = '<div class="boost"><div class="boost-head"><b>' + esc(L.boostTitle) + "</b><span>" + esc(L.boostSub) + "</span></div>";
+    if (it.featured && it.featuredUntil) h += '<p class="feat-until">' + esc(L.featuredUntil.replace("{d}", fmtUntil(it.featuredUntil))) + "</p>";
+    h += '<div class="boost-opts">' + opts.map(function (o) {
+      return '<button type="button" class="boost-opt" data-boost="' + o[0] + '" aria-pressed="' + (boostPick === o[0]) + '">' +
+        '<span class="bn">' + esc(o[1]) + '</span><span class="bp">' + money.format(PRICES[o[0]]) + '</span><span class="bd">' + esc(o[2]) + "</span></button>";
+    }).join("") + "</div>";
+    if (boostPick) {
+      var code = boostCode(it.id, boostPick), amount = PRICES[boostPick];
+      h += '<ol class="pay-steps">' +
+        "<li>" + esc(L.payStep1) + "</li>" +
+        "<li>" + esc(L.payStep2) + ':<div class="pay-val"><b>' + esc(GCASH.number) + "</b>" + (GCASH.name ? "<small>" + esc(GCASH.name) + "</small>" : "") + copyBtn(String(GCASH.number).replace(/[^\d+]/g, "")) + "</div></li>" +
+        "<li>" + esc(L.payStep3) + ':<div class="pay-val"><b>' + money.format(amount) + "</b>" + copyBtn(String(amount)) + "</div></li>" +
+        "<li>" + esc(L.payStep4) + ':<div class="pay-val"><b>' + esc(code) + "</b>" + copyBtn(code) + "</div></li>" +
+        "</ol>" +
+        '<p class="note">' + esc(L.payNote) + "</p>" +
+        '<p class="note">' + esc(L.payWarn) + "</p>";
+    }
+    return h + '<a class="btn-link small" href="/presyo.html">' + esc(L.seePrices) + "</a></div>";
+  }
+  // Only Aiman (profiles.is_admin) sees this box; it stays in French on purpose
+  function adminHtml(it) {
+    function btn(kind, name) {
+      var label = adminArmed === kind ? "Confirmer : " + money.format(PRICES[kind]) + " reçu ?" : "Activer " + name;
+      return '<button type="button" class="btn-ghost" data-admin-boost="' + kind + '">' + esc(label) + "</button>";
+    }
+    return '<div class="admin-box"><b>Admin (visible par toi seul)</b>' +
+      "<span>Codes GCash de cette annonce : " + boostCode(it.id, "bump") + " = I-angat " + money.format(PRICES.bump) +
+      " · " + boostCode(it.id, "feature") + " = Tampok " + money.format(PRICES.feature) + "</span>" +
+      (it.featured && it.featuredUntil ? "<span>En vedette jusqu'au " + esc(fmtUntil(it.featuredUntil, "fr-FR")) + "</span>" : "") +
+      '<div class="owner-actions">' + btn("bump", "I-angat") + btn("feature", "Tampok") + "</div></div>";
+  }
+  function copyText(value) {
+    var done = function () { showToast(t().copied); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(value).then(done).catch(function () { showToast(value); });
+    else showToast(value);
+  }
+
   // Detail
   function findListing(id) { return listings.filter(function (it) { return String(it.id) === String(id); })[0]; }
-  var openId = null, contactShown = null, deleteArmed = false;
+  var openId = null, contactShown = null, deleteArmed = false, boostPick = null, adminArmed = null;
   function renderDetail() {
     var it = findListing(openId);
     if (!it) return;
@@ -918,7 +995,8 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
     var desc = it.desc ? (it.desc[state.lang] || it.desc.tl) : "";
     var actions;
     if (it.mine && live()) {
-      actions = '<div class="owner-actions"><button type="button" class="btn-ghost" id="soldBtn">' + esc(L.markSold) + "</button>" +
+      actions = (GCASH.number ? boostHtml(it, L) : "") +
+        '<div class="owner-actions"><button type="button" class="btn-ghost" id="soldBtn">' + esc(L.markSold) + "</button>" +
         '<button type="button" class="btn-danger" id="deleteBtn">' + esc(deleteArmed ? L.confirmDelete : L.deleteListing) + "</button></div>";
     } else {
       actions = '<div class="actions" style="justify-content:space-between">' +
@@ -941,13 +1019,15 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
           '<a class="btn-share" id="shareFb" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(listingUrl(it.id)) + '">' + FB + esc(L.shareFb) + "</a>" +
           (MOBILE ? '<a class="btn-share" href="fb-messenger://share/?link=' + encodeURIComponent(listingUrl(it.id)) + '">' + MSG + esc(L.shareMessenger) + "</a>" : "") +
         "</div>" +
-        '<div class="safety"><b>' + esc(L.safetyTitle) + "</b><ul>" + L.safety.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div>" +
+        // Buyer safety tips are not shown to the seller on their own listing
+        (it.mine && live() ? "" : '<div class="safety"><b>' + esc(L.safetyTitle) + "</b><ul>" + L.safety.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div>") +
         actions +
+        (isAdmin && live() ? adminHtml(it) : "") +
       "</div>";
   }
   var detailDlg = document.getElementById("detailDialog");
   function openDetail(id) {
-    openId = id; contactShown = null; deleteArmed = false; renderDetail();
+    openId = id; contactShown = null; deleteArmed = false; boostPick = null; adminArmed = null; renderDetail();
     openDialog(detailDlg);
   }
   function doContact() {
@@ -993,6 +1073,29 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
   document.getElementById("closeDetail").addEventListener("click", function () { detailDlg.close(); });
   detailDlg.addEventListener("click", function (e) {
     if (e.target === detailDlg) { detailDlg.close(); return; }
+    var copyEl = e.target.closest("[data-copy]");
+    if (copyEl) { copyText(copyEl.getAttribute("data-copy")); return; }
+    var pick = e.target.closest("[data-boost]");
+    if (pick) {
+      boostPick = pick.getAttribute("data-boost"); renderDetail();
+      var steps = document.querySelector("#detailBody .pay-steps");
+      if (steps) steps.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      return;
+    }
+    var adminBtn = e.target.closest("[data-admin-boost]");
+    if (adminBtn) {
+      var kind = adminBtn.getAttribute("data-admin-boost");
+      if (adminArmed !== kind) { adminArmed = kind; renderDetail(); return; }
+      adminArmed = null; adminBtn.disabled = true;
+      var boostedId = openId;
+      api.applyBoost(boostedId, kind).then(function () {
+        showToast(kind === "feature" ? "Tampok activé pour 7 jours." : "I-angat activé.");
+        return load();
+      }).then(function () {
+        if (detailDlg.open && String(openId) === String(boostedId)) renderDetail();
+      }).catch(function () { showToast("L'activation n'a pas marché. Réessaie."); renderDetail(); });
+      return;
+    }
     if (e.target.closest("#contactBtn")) doContact();
     if (e.target.closest("#shareBtn")) doShare();
     if (e.target.closest("#reportBtn")) doReport();
@@ -1031,6 +1134,9 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
   qInput.addEventListener("input", function () { state.q = qInput.value; renderGrid(); });
   document.getElementById("searchForm").addEventListener("submit", function (e) {
     e.preventDefault(); state.q = qInput.value; renderGrid();
+    // A payment code from GCash (GS-42-T) opens that listing directly
+    var code = codeMatch(state.q);
+    if (code && findListing(code[1])) { openDetail(code[1]); return; }
     document.getElementById("grid").scrollIntoView({ behavior: "smooth", block: "start" });
   });
   document.getElementById("grid").addEventListener("click", function (e) {
@@ -1108,7 +1214,7 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
       showToast(t().fbError);
       try { history.replaceState(null, "", location.pathname); } catch (e) {}
     }
-    return load().then(openFromHash);
+    return refreshAdmin().then(load).then(openFromHash);
   });
 })();
 </script>

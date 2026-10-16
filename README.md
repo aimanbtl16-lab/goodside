@@ -9,7 +9,8 @@ Ce dossier est le vrai site. Sans configuration, il tourne en mode démo avec le
 | `index.html` | La page et sa logique |
 | `i18n.js` | Tous les textes, tagalog et anglais |
 | `api.js` | La connexion à Supabase (ou au mode démo) |
-| `config.js` | Les 2 clés Supabase à remplir |
+| `config.js` | Les clés Supabase, les moyens de connexion, les prix et ton numéro GCash |
+| `presyo.html` | La page des prix |
 | `listings.js` | Les annonces d'exemple du mode démo |
 | `supabase/schema.sql` | La base de données à créer une seule fois |
 
@@ -59,7 +60,16 @@ Tu peux alors voir les signalements dans **Table Editor > reports**, et remettre
 
 ## Vendre de la visibilité (I-angat et Tampok)
 
-Tant que PayMongo ou Xendit n'est pas branché, tu peux déjà vendre ces options à la main : le vendeur te paie par GCash, puis tu lances dans le SQL Editor (avec le numéro de l'annonce) :
+Prix dans `config.js` (`prices`) : I-angat ₱49, Tampok ₱149 pour 7 jours. La page `presyo.html` les affiche.
+
+Tant que PayMongo ou Xendit n'est pas branché, le paiement se fait à la main par GCash :
+
+1. Mets ton numéro GCash et ton nom tel que GCash l'affiche dans `config.js` (`gcash`). Sans numéro, le bouton n'apparaît pas.
+2. Sur sa propre annonce, le vendeur choisit I-angat ou Tampok et voit ton numéro, le montant et un code : `GS-42-A` (I-angat de l'annonce 42) ou `GS-42-T` (Tampok).
+3. Il t'envoie l'argent par GCash avec ce code dans le message.
+4. Connecté sur le site, tape le code dans la recherche : l'annonce s'ouvre avec un cadre « Admin » que toi seul vois. Appuie sur « Activer », puis confirme.
+
+Tu peux aussi le faire dans le SQL Editor :
 
 ```sql
 select public.apply_boost(42, 'bump');     -- I-angat : l'annonce 42 repasse en tête

@@ -8,5 +8,10 @@ window.GOODSIDE_CONFIG = {
   facebookPage: "https://www.facebook.com/share/19mtFn7upC/",
   // Moyens de connexion affichés. phone : code par SMS (Semaphore, à activer dans Supabase).
   // facebook : bouton Facebook (app Meta à brancher dans Supabase). email : lien par email, en secours.
-  login: { phone: true, facebook: true, email: true }
+  login: { phone: true, facebook: true, email: true },
+  // Options payantes, prix en pesos. bump = I-angat (remonte l'annonce), feature = Tampok (en vedette 7 jours).
+  prices: { bump: 49, feature: 149 },
+  // Compte GCash qui reçoit les paiements des options. number vide = le bouton « Palakasin » n'apparaît pas.
+  // name : le nom tel que GCash l'affiche à celui qui paie, pour qu'il vérifie qu'il envoie au bon compte.
+  gcash: { number: "", name: "" }
 };

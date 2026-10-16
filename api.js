@@ -28,6 +28,7 @@
       desc: r.description ? { tl: r.description, en: r.description } : null,
       photos: (r.photo_paths || []).map(photoUrl),
       featured: !!(r.featured_until && new Date(r.featured_until) > new Date()),
+      featuredUntil: r.featured_until || null,
       mine: !!(user && r.user_id === user.id)
     };
   }
@@ -159,6 +160,22 @@
         // Remove the listing's photos too; a failure here never blocks the delete
         if (!paths.length) return { ok: true };
         return client.storage.from(BUCKET).remove(paths).then(function () { return { ok: true }; }, function () { return { ok: true }; });
+      });
+    },
+
+    // Admin only: is the signed-in account a moderator? (profiles.is_admin, never settable from the site)
+    isAdmin: function () {
+      if (!client || !user) return Promise.resolve(false);
+      return client.rpc("is_admin").then(function (res) { return !res.error && res.data === true; });
+    },
+
+    // Admin only: turn on I-angat ("bump") or Tampok ("feature") after the GCash payment arrived.
+    // The database refuses it for anyone who is not admin.
+    applyBoost: function (id, kind) {
+      if (!client) return Promise.resolve({ demo: true });
+      return client.rpc("apply_boost", { listing_id: Number(id), kind: kind }).then(function (res) {
+        if (res.error) throw fail("boost", res.error);
+        return { ok: true };
       });
     },
 
