@@ -11,6 +11,7 @@ Ce dossier est le vrai site. Sans configuration, il tourne en mode démo avec le
 | `api.js` | La connexion à Supabase (ou au mode démo) |
 | `config.js` | Les clés Supabase, les moyens de connexion, les prix et ton numéro GCash |
 | `presyo.html` | La page des prix |
+| `robots.txt`, `sitemap.xml` | Pour Google : les pages à visiter. Ajouter ici toute nouvelle page publique |
 | `listings.js` | Les annonces d'exemple du mode démo |
 | `supabase/schema.sql` | La base de données à créer une seule fois |
 
