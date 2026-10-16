@@ -342,6 +342,26 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
 .actions { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
 .btn-ghost { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 10px 18px; cursor: pointer; font-weight: 700; }
 
+/* Login: phone code first, then Facebook, email as a small backup */
+.login-step { display: flex; flex-direction: column; gap: 12px; }
+.btn-wide { width: 100%; justify-content: center; }
+.phone-field { display: flex; align-items: stretch; border: 1px solid var(--line); background: var(--bg); border-radius: var(--radius-sm); overflow: hidden; }
+.phone-field:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.phone-field .cc { display: flex; align-items: center; padding: 0 10px 0 12px; font-weight: 700; color: var(--muted); border-right: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.field .phone-field input { border: 0; border-radius: 0; background: transparent; font-size: 17px; font-variant-numeric: tabular-nums; }
+.field .phone-field input:focus { box-shadow: none; }
+.field .code-input { font-size: 24px; letter-spacing: .4em; text-align: center; font-variant-numeric: tabular-nums; padding-left: calc(12px + .4em); }
+.login-links { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.btn-link { border: 0; background: none; padding: 4px 0; color: var(--accent-strong); font-weight: 700; font-size: 14px; cursor: pointer; }
+.btn-link[disabled] { color: var(--muted); cursor: default; }
+.btn-link.small { align-self: center; font-size: 13px; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; }
+.or { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; }
+.or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.btn-fb { display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; border: 0; border-radius: 999px; padding: 12px 18px; background: #1877F2; color: #FFFFFF; font-weight: 700; font-size: 15px; cursor: pointer; }
+.btn-fb:hover { background: #166FE5; }
+.btn-fb svg { width: 20px; height: 20px; flex: none; }
+.btn-fb[disabled], .btn-link.small[disabled] { opacity: .6; cursor: progress; }
+
 .toast {
   position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
   background: var(--fg); color: var(--bg); padding: 12px 18px; border-radius: 999px; font-weight: 700; z-index: 50;
@@ -522,22 +542,55 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
   </form>
 </dialog>
 
-<dialog id="loginDialog">
-  <form class="modal" id="loginForm" novalidate>
-    <h3 data-i18n="loginTitle"></h3>
+<dialog id="loginDialog" aria-labelledby="loginTitle">
+  <div class="modal">
+    <h3 id="loginTitle" data-i18n="loginTitle"></h3>
     <p class="note" id="loginReason" hidden></p>
-    <p class="note" data-i18n="loginNote"></p>
-    <div class="field">
-      <label for="lEmail" data-i18n="fieldEmail"></label>
-      <input id="lEmail" type="email" autocomplete="email" placeholder="juan@email.com">
-    </div>
-    <p class="error" id="lError" hidden></p>
-    <p class="ok" id="lOk" hidden></p>
+
+    <form class="login-step" id="phoneForm" novalidate>
+      <div class="field">
+        <label for="lPhone" data-i18n="fieldPhone"></label>
+        <div class="phone-field">
+          <span class="cc">+63</span>
+          <input id="lPhone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="917 123 4567" maxlength="16">
+        </div>
+      </div>
+      <button type="submit" class="btn-post btn-wide" id="sendCode" data-i18n="sendCode"></button>
+      <p class="note" data-i18n="phoneNote"></p>
+    </form>
+
+    <form class="login-step" id="codeForm" novalidate hidden>
+      <p class="note" id="codeSentTo"></p>
+      <div class="field">
+        <label for="lCode" data-i18n="fieldCode"></label>
+        <input id="lCode" class="code-input" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="······">
+      </div>
+      <button type="submit" class="btn-post btn-wide" id="verifyCode" data-i18n="verifyCode"></button>
+      <div class="login-links">
+        <button type="button" class="btn-link" id="changePhone" data-i18n="changePhone"></button>
+        <button type="button" class="btn-link" id="resendCode"></button>
+      </div>
+    </form>
+
+    <div class="or" id="loginOr"><span data-i18n="or"></span></div>
+    <button type="button" class="btn-fb" id="fbLogin"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.5c-1.5 0-1.96.93-1.96 1.89v2.26h3.33l-.53 3.49h-2.8V24C19.62 23.1 24 18.1 24 12.07z"/></svg><span data-i18n="fbLogin"></span></button>
+
+    <button type="button" class="btn-link small" id="useEmail" data-i18n="useEmail"></button>
+    <form class="login-step" id="emailForm" novalidate hidden>
+      <div class="field">
+        <label for="lEmail" data-i18n="fieldEmail"></label>
+        <input id="lEmail" type="email" autocomplete="email" placeholder="juan@email.com">
+      </div>
+      <p class="note" data-i18n="loginNote"></p>
+      <button type="submit" class="btn-ghost" id="sendLink" data-i18n="sendLink"></button>
+    </form>
+
+    <p class="error" id="lError" role="alert" hidden></p>
+    <p class="ok" id="lOk" role="status" hidden></p>
     <div class="actions">
       <button type="button" class="btn-ghost" id="cancelLogin" data-i18n="cancel"></button>
-      <button type="submit" class="btn-post" id="sendLink" data-i18n="sendLink"></button>
     </div>
-  </form>
+  </div>
 </dialog>
 
 <dialog id="detailDialog" aria-labelledby="dTitle">
@@ -642,7 +695,7 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
     btn.hidden = !live();
     var u = api.user();
     btn.textContent = u ? t().logout : t().login;
-    btn.title = u ? (u.email || "") : "";
+    btn.title = u ? accountLabel(u) : "";
   }
 
   function renderCats() {
@@ -728,32 +781,123 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
     }).catch(function () { loadState = "error"; renderGrid(); });
   }
 
-  // Login
+  // Login: code by SMS first, then Facebook, email link as a small backup (each can be turned off in config.js)
+  var LOGIN = Object.assign({ phone: false, facebook: false, email: true }, (window.GOODSIDE_CONFIG || {}).login || {});
   var loginDlg = document.getElementById("loginDialog");
-  var pendingAction = null;
+  var pendingAction = null, loginPhone = "", resendTimer = null;
+  function byId(id) { return document.getElementById(id); }
+  function loginMsg(errText, okText) {
+    var err = byId("lError"), ok = byId("lOk");
+    err.textContent = errText || ""; err.hidden = !errText;
+    ok.textContent = okText || ""; ok.hidden = !okText;
+  }
+  // "0917 123 4567", "917...", "+63 917..." -> "+639171234567" (Philippine mobile numbers only)
+  function normPhone(v) {
+    var d = String(v || "").replace(/\D/g, "");
+    if (d.indexOf("63") === 0) d = d.slice(2);
+    else if (d.charAt(0) === "0") d = d.slice(1);
+    return /^9\d{9}$/.test(d) ? "+63" + d : null;
+  }
+  function prettyPhone(p) {
+    var d = String(p).replace(/\D/g, "").replace(/^63/, "");
+    return "+63 " + d.slice(0, 3) + " " + d.slice(3, 6) + " " + d.slice(6);
+  }
+  function accountLabel(u) { return u.email || (u.phone ? prettyPhone(u.phone) : ""); }
+  function showPhoneStep(step) {
+    byId("phoneForm").hidden = !LOGIN.phone || step !== "phone";
+    byId("codeForm").hidden = !LOGIN.phone || step !== "code";
+  }
+  function resetLogin() {
+    var hasMain = LOGIN.phone || LOGIN.facebook;
+    showPhoneStep("phone");
+    byId("loginOr").hidden = !(LOGIN.phone && LOGIN.facebook);
+    byId("fbLogin").hidden = !LOGIN.facebook; byId("fbLogin").disabled = false;
+    byId("useEmail").hidden = !(LOGIN.email && hasMain);
+    byId("emailForm").hidden = !(LOGIN.email && !hasMain);
+    clearInterval(resendTimer);
+    loginMsg();
+  }
   function requireLogin(reason, action) {
     pendingAction = action || null;
-    var r = document.getElementById("loginReason");
+    var r = byId("loginReason");
     r.textContent = reason || ""; r.hidden = !reason;
-    document.getElementById("lError").hidden = true;
-    document.getElementById("lOk").hidden = true;
+    resetLogin();
     openDialog(loginDlg);
-    document.getElementById("lEmail").focus();
+    (LOGIN.phone ? byId("lPhone") : !byId("emailForm").hidden ? byId("lEmail") : byId("fbLogin")).focus();
   }
   document.getElementById("accountBtn").addEventListener("click", function () {
     if (api.user()) { api.signOut().then(function () { renderAccount(); load(); }); }
     else requireLogin();
   });
   document.getElementById("cancelLogin").addEventListener("click", function () { loginDlg.close(); });
-  document.getElementById("loginForm").addEventListener("submit", function (e) {
+  loginDlg.addEventListener("close", function () { clearInterval(resendTimer); });
+
+  function startResendTimer() {
+    var left = 60, b = byId("resendCode");
+    clearInterval(resendTimer);
+    function tick() {
+      b.disabled = left > 0;
+      b.textContent = left > 0 ? t().resendIn.replace("{s}", left) : t().resendCode;
+      if (--left < 0) clearInterval(resendTimer);
+    }
+    tick(); resendTimer = setInterval(tick, 1000);
+  }
+  function sendCode(phone, btn) {
+    btn.disabled = true; loginMsg();
+    return api.sendPhoneCode(phone).then(function () {
+      loginPhone = phone;
+      byId("codeSentTo").textContent = t().codeSentTo.replace("{n}", prettyPhone(phone));
+      byId("lCode").value = "";
+      showPhoneStep("code"); startResendTimer();
+      byId("lCode").focus();
+    }).catch(function (err) { loginMsg(err.code === "rate" ? t().tooMany : t().codeError); })
+      .then(function () { btn.disabled = false; });
+  }
+  byId("phoneForm").addEventListener("submit", function (e) {
     e.preventDefault();
-    var email = document.getElementById("lEmail").value.trim();
-    var err = document.getElementById("lError"), ok = document.getElementById("lOk");
-    err.hidden = true; ok.hidden = true;
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = t().badEmail; err.hidden = false; return; }
-    var btn = document.getElementById("sendLink"); btn.disabled = true;
-    api.signIn(email).then(function () { ok.textContent = t().linkSent; ok.hidden = false; })
-      .catch(function () { err.textContent = t().loginError; err.hidden = false; })
+    var phone = normPhone(byId("lPhone").value);
+    if (!phone) { loginMsg(t().badPhone); byId("lPhone").focus(); return; }
+    sendCode(phone, byId("sendCode"));
+  });
+  byId("resendCode").addEventListener("click", function () { if (loginPhone) sendCode(loginPhone, this); });
+  byId("changePhone").addEventListener("click", function () {
+    clearInterval(resendTimer); loginMsg(); showPhoneStep("phone"); byId("lPhone").focus();
+  });
+  var verifying = false;
+  function verifyCode() {
+    var code = byId("lCode").value.replace(/\D/g, "");
+    if (code.length !== 6) { loginMsg(t().badCode); return; }
+    if (verifying) return;
+    verifying = true; loginMsg();
+    var btn = byId("verifyCode"); btn.disabled = true;
+    api.verifyPhoneCode(loginPhone, code)
+      .catch(function (err) { loginMsg(err.code === "rate" ? t().tooMany : t().badCode); byId("lCode").select(); })
+      .then(function () { btn.disabled = false; verifying = false; });
+  }
+  byId("codeForm").addEventListener("submit", function (e) { e.preventDefault(); verifyCode(); });
+  // Codes pasted or filled in from the SMS log in right away
+  byId("lCode").addEventListener("input", function () {
+    var v = this.value.replace(/\D/g, "").slice(0, 6);
+    if (v !== this.value) this.value = v;
+    if (v.length === 6) verifyCode();
+  });
+
+  byId("fbLogin").addEventListener("click", function () {
+    var b = this; b.disabled = true; loginMsg();
+    api.signInFacebook().catch(function () { loginMsg(t().fbError); b.disabled = false; });
+  });
+
+  byId("useEmail").addEventListener("click", function () {
+    this.hidden = true; byId("emailForm").hidden = false; byId("lEmail").focus();
+  });
+  byId("emailForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var email = byId("lEmail").value.trim();
+    loginMsg();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { loginMsg(t().badEmail); return; }
+    var btn = byId("sendLink"); btn.disabled = true;
+    api.signIn(email).then(function () { loginMsg("", t().linkSent); })
+      .catch(function () { loginMsg(t().loginError); })
       .then(function () { btn.disabled = false; });
   });
   function authChanged() {
@@ -907,6 +1051,8 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
   function openPost() {
     if (live() && !api.user()) { requireLogin(t().loginFirst, openPost); return; }
     fError.hidden = true;
+    var u = api.user(), fc = document.getElementById("fContact");
+    if (u && u.phone && !fc.value) fc.value = prettyPhone(u.phone).replace("+63 ", "0");
     openDialog(dlg);
     document.getElementById("fTitle").focus();
   }
@@ -953,10 +1099,15 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
     toastTimer = setTimeout(function () { el.hidden = true; }, 2600);
   }
 
+  var authError = /[#&?]error_description=/.test(location.hash + location.search);
   renderAll();
   api.init().catch(function () { return null; }).then(function () {
     renderAll();
     api.onAuthChange(authChanged);
+    if (authError) {
+      showToast(t().fbError);
+      try { history.replaceState(null, "", location.pathname); } catch (e) {}
+    }
     return load().then(openFromHash);
   });
 })();

@@ -221,3 +221,51 @@ end $$;
 
 -- 7. Pour devenir admin (modération), après ta première connexion sur le site :
 -- update public.profiles set is_admin = true where id = (select id from auth.users where email = 'TON-EMAIL');
+
+-- 8. Connexion par téléphone : envoi du code SMS par Semaphore (Philippines).
+-- Branché dans Supabase : Authentication > Auth Hooks > Send SMS hook > Postgres > public.send_sms_semaphore.
+-- La clé API Semaphore est dans Vault sous le nom 'semaphore_api_key' (jamais dans ce fichier).
+create extension if not exists pg_net with schema extensions;
+
+create or replace function public.send_sms_semaphore(event jsonb)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  phone text := regexp_replace(coalesce(event->'user'->>'phone', ''), '[^0-9]', '', 'g');
+  otp text := event->'sms'->>'otp';
+  api_key text;
+begin
+  -- Only Supabase Auth may send codes (blocks calls from the public API, which would cost SMS credits)
+  if session_user <> 'supabase_auth_admin' then
+    return jsonb_build_object('error', jsonb_build_object('http_code', 403, 'message', 'Not allowed'));
+  end if;
+  -- Philippine mobile numbers only (639XXXXXXXXX): no costly messages to other countries
+  if phone !~ '^639[0-9]{9}$' then
+    return jsonb_build_object('error', jsonb_build_object('http_code', 400, 'message', 'Philippine mobile numbers only'));
+  end if;
+  if otp is null or otp !~ '^[0-9]{4,10}$' then
+    return jsonb_build_object('error', jsonb_build_object('http_code', 400, 'message', 'Missing code'));
+  end if;
+  select decrypted_secret into api_key from vault.decrypted_secrets where name = 'semaphore_api_key' limit 1;
+  if api_key is null or api_key = '' then
+    return jsonb_build_object('error', jsonb_build_object('http_code', 500, 'message', 'SMS service not configured'));
+  end if;
+  -- OTP route of Semaphore: {otp} is replaced by our own code passed in "code"
+  perform net.http_post(
+    url := 'https://api.semaphore.co/api/v4/otp',
+    body := jsonb_build_object(
+      'apikey', api_key,
+      'number', phone,
+      'message', 'Good Side code: {otp}. Huwag itong ibigay kahit kanino.',
+      'code', otp
+    ),
+    headers := '{"Content-Type": "application/json"}'::jsonb
+  );
+  return '{}'::jsonb;
+end;
+$$;
+
+grant execute on function public.send_sms_semaphore(jsonb) to supabase_auth_admin;

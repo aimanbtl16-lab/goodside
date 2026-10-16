@@ -162,6 +162,31 @@
       });
     },
 
+    // Phone login: Supabase texts a 6-digit code (Send SMS hook -> Semaphore), then the code is checked
+    sendPhoneCode: function (phone) {
+      if (!client) return Promise.resolve({ demo: true });
+      return client.auth.signInWithOtp({ phone: phone }).then(function (res) {
+        if (res.error) throw fail(res.error.status === 429 ? "rate" : "sms", res.error);
+        return { ok: true };
+      });
+    },
+
+    verifyPhoneCode: function (phone, code) {
+      if (!client) return Promise.resolve({ demo: true });
+      return client.auth.verifyOtp({ phone: phone, token: code, type: "sms" }).then(function (res) {
+        if (res.error) throw fail(res.error.status === 429 ? "rate" : "code", res.error);
+        return { ok: true };
+      });
+    },
+
+    signInFacebook: function () {
+      if (!client) return Promise.resolve({ demo: true });
+      return client.auth.signInWithOAuth({
+        provider: "facebook",
+        options: { redirectTo: location.origin + location.pathname }
+      }).then(function (res) { if (res.error) throw fail("facebook", res.error); return { ok: true }; });
+    },
+
     signIn: function (email) {
       if (!client) return Promise.resolve({ demo: true });
       return client.auth.signInWithOtp({
