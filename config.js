@@ -13,5 +13,5 @@ window.GOODSIDE_CONFIG = {
   prices: { bump: 49, feature: 149 },
   // Compte GCash qui reçoit les paiements des options. number vide = le bouton « Palakasin » n'apparaît pas.
   // name : le nom tel que GCash l'affiche à celui qui paie, pour qu'il vérifie qu'il envoie au bon compte.
-  gcash: { number: "", name: "" }
+  gcash: { number: "+33 6 75 40 02 67", name: "Aiman B." }
 };
