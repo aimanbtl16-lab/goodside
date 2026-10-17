@@ -4,7 +4,7 @@
 (function () {
   var cfg = window.GOODSIDE_CONFIG || {};
   var BUCKET = "listing-photos";
-  var COLS = "id,user_id,cat,title,description,price,unit,location,photo_paths,created_at,bumped_at,featured_until";
+  var COLS = "id,user_id,cat,title,description,price,unit,location,photo_paths,created_at,bumped_at,featured_until,negotiable,deals,phone_verified";
   var client = null;
   var user = null;
   var demoSeq = 1000;
@@ -29,6 +29,9 @@
       photos: (r.photo_paths || []).map(photoUrl),
       featured: !!(r.featured_until && new Date(r.featured_until) > new Date()),
       featuredUntil: r.featured_until || null,
+      negotiable: !!r.negotiable,
+      deals: r.deals || [],
+      verified: !!r.phone_verified,
       mine: !!(user && r.user_id === user.id)
     };
   }
@@ -96,7 +99,8 @@
         return Promise.resolve({
           id: "u" + (demoSeq++), cat: data.cat, price: data.price, unit: data.unit, loc: data.loc, date: today,
           title: { tl: data.title, en: data.title }, desc: data.desc ? { tl: data.desc, en: data.desc } : null,
-          photos: (files || []).map(function (f) { return URL.createObjectURL(f); }), mine: true
+          photos: (files || []).map(function (f) { return URL.createObjectURL(f); }), mine: true,
+          negotiable: !!data.negotiable, deals: data.deals || [], verified: false
         });
       }
       if (!user) return Promise.reject(fail("auth"));
@@ -110,7 +114,8 @@
       return Promise.all(uploads).then(function (paths) {
         return client.from("listings").insert({
           cat: data.cat, title: data.title, description: data.desc || null, price: data.price,
-          unit: data.unit || "", location: data.loc, photo_paths: paths
+          unit: data.unit || "", location: data.loc, photo_paths: paths,
+          negotiable: !!data.negotiable, deals: data.deals || []
         }).select(COLS).single();
       }).then(function (res) {
         if (res.error) throw fail(/Limit reached/.test(res.error.message || "") ? "limit" : "post", res.error);

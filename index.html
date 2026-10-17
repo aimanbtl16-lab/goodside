@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="Good Side (goodsideph.com): libreng buy and sell sa Pilipinas. Sasakyan, ari-arian, electronics, gamit sa bahay, trabaho at serbisyo. Direktang kausapin ang nagbebenta.">
+<meta name="description" content="Good Side (goodsideph.com): libreng buy and sell sa Pilipinas. Sasakyan, motorsiklo, cellphone, paupahan, ari-arian, ukay, trabaho at serbisyo. Direktang kausapin ang nagbebenta.">
 <link rel="canonical" href="https://www.goodsideph.com/">
 <!-- Pour Google : nom du site dans les résultats, distinct des autres marques « Goodside ». -->
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Good Side PH","alternateName":["Good Side","goodsideph"],"url":"https://www.goodsideph.com/","inLanguage":["fil","en"]}</script>
@@ -53,6 +53,10 @@
   --c-kasangkapan-a: #FFF8DA; --c-kasangkapan-b: #FBE9A6;
   --c-trabaho-a: #E9F6FB; --c-trabaho-b: #C5E6F2;
   --c-serbisyo-a: #FDECEE; --c-serbisyo-b: #F8CDD3;
+  --c-motorsiklo-a: #FDEFE4; --c-motorsiklo-b: #F8D3B5;
+  --c-cellphone-a: #F6ECFB; --c-cellphone-b: #E5CDF3;
+  --c-paupahan-a: #EAF7E8; --c-paupahan-b: #C9E9C3;
+  --c-damit-a: #FCEBF3; --c-damit-b: #F6CBE0;
   --c-icon: rgba(26, 43, 51, .45);
   --font-display: "Outfit", "Avenir Next", "Segoe UI", system-ui, sans-serif;
   --font-body: "Nunito Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
@@ -74,6 +78,10 @@
     --c-kasangkapan-a: #3A3317; --c-kasangkapan-b: #574B20;
     --c-trabaho-a: #1A3140; --c-trabaho-b: #284A5F;
     --c-serbisyo-a: #3A1C22; --c-serbisyo-b: #5A2C34;
+    --c-motorsiklo-a: #3A2618; --c-motorsiklo-b: #5A3A22;
+    --c-cellphone-a: #33213F; --c-cellphone-b: #4E3262;
+    --c-paupahan-a: #1E3320; --c-paupahan-b: #2D4E30;
+    --c-damit-a: #3A1D2C; --c-damit-b: #5A2D44;
     --c-icon: rgba(230, 240, 238, .6);
     color-scheme: dark;
   }
@@ -92,6 +100,10 @@
   --c-kasangkapan-a: #3A3317; --c-kasangkapan-b: #574B20;
   --c-trabaho-a: #1A3140; --c-trabaho-b: #284A5F;
   --c-serbisyo-a: #3A1C22; --c-serbisyo-b: #5A2C34;
+  --c-motorsiklo-a: #3A2618; --c-motorsiklo-b: #5A3A22;
+  --c-cellphone-a: #33213F; --c-cellphone-b: #4E3262;
+  --c-paupahan-a: #1E3320; --c-paupahan-b: #2D4E30;
+  --c-damit-a: #3A1D2C; --c-damit-b: #5A2D44;
   --c-icon: rgba(230, 240, 238, .6);
   color-scheme: dark;
 }
@@ -301,6 +313,23 @@ textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3
 .ok { font-size: 14px; color: var(--accent-strong); font-weight: 700; margin: 0; }
 .btn-post[disabled] { opacity: .6; cursor: progress; }
 .chip.feat { background: var(--ph-yellow); color: #3A2E00; }
+/* Verified number, Pwede tawad, meet-up / COD / shipping */
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: 999px; background: var(--bg); color: var(--muted); border: 1px solid var(--line); }
+.tag svg { width: 13px; height: 13px; flex: none; }
+.tag.ok { background: var(--accent-soft); color: var(--accent-strong); border-color: transparent; }
+.tag.nego { background: var(--ph-yellow-soft); color: var(--fg); border-color: transparent; }
+.detail .tags { gap: 8px; }
+.detail .tag { font-size: 13px; padding: 4px 11px; }
+.deals { margin: 0; font-size: 14px; }
+.deals b { margin-right: 6px; }
+.opts { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.opts legend { font-weight: 700; font-size: 14px; padding: 0; margin-bottom: 8px; }
+.checks { display: flex; flex-wrap: wrap; gap: 8px; }
+.check { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: 7px 13px; font-weight: 600; font-size: 14px; cursor: pointer; }
+.check:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.check input { width: 17px; height: 17px; margin: 0; accent-color: var(--accent-strong); }
+.check:focus-within { box-shadow: 0 0 0 3px var(--accent-soft); }
 .share-row { display: flex; gap: 10px; flex-wrap: wrap; }
 .btn-share { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 999px; padding: 8px 14px; font-weight: 700; cursor: pointer; text-decoration: none; font-size: 14px; }
 .btn-share:hover { border-color: var(--accent); }
@@ -533,6 +562,9 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
         <select id="fUnit"></select>
       </div>
     </div>
+    <div class="checks">
+      <label class="check"><input type="checkbox" id="fNego"><span data-i18n="fieldNegotiable"></span></label>
+    </div>
     <div class="two">
       <div class="field">
         <label for="fCat" data-i18n="fieldCategory"></label>
@@ -543,6 +575,14 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
         <input id="fLoc" data-i18n-ph="fieldLocationPh" maxlength="40">
       </div>
     </div>
+    <fieldset class="opts">
+      <legend data-i18n="fieldDeals"></legend>
+      <div class="checks">
+        <label class="check"><input type="checkbox" name="deal" value="meetup"><span data-deal="meetup"></span></label>
+        <label class="check"><input type="checkbox" name="deal" value="cod"><span data-deal="cod"></span></label>
+        <label class="check"><input type="checkbox" name="deal" value="shipping"><span data-deal="shipping"></span></label>
+      </div>
+    </fieldset>
     <div class="field">
       <label for="fDesc" data-i18n="fieldDesc"></label>
       <textarea id="fDesc" data-i18n-ph="fieldDescPh" maxlength="500"></textarea>
@@ -637,13 +677,18 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
   var listings = [];
   var loadState = "loading"; // loading | ready | error
 
-  var CAT_ORDER = ["sasakyan", "ariarian", "electronics", "kasangkapan", "trabaho", "serbisyo"];
+  var CAT_ORDER = ["sasakyan", "motorsiklo", "cellphone", "electronics", "ariarian", "paupahan", "damit", "kasangkapan", "trabaho", "serbisyo"];
+  var DEALS = ["meetup", "cod", "shipping"];
   var UNITS = [["", "unitNone"], ["month", "unitMonth"], ["hour", "unitHour"]];
   var ICONS = {
     all: '<rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/>',
     sasakyan: '<path d="M3 16v-3l2.2-5A2 2 0 0 1 7 7h10a2 2 0 0 1 1.8 1L21 13v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M3 13h18"/><circle cx="7.5" cy="17" r="1.8"/><circle cx="16.5" cy="17" r="1.8"/>',
     ariarian: '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
-    electronics: '<rect x="7" y="2.5" width="10" height="19" rx="2.2"/><path d="M11 18.5h2"/>',
+    paupahan: '<circle cx="8" cy="15" r="4.5"/><path d="M11.2 11.8L20 3"/><path d="M16.5 6.5l2.5 2.5"/><path d="M14 9l2 2"/>',
+    damit: '<path d="M9 3.5l-6 3.2 2 4.3 3-1.4V20.5h8V9.6l3 1.4 2-4.3-6-3.2a3 3 0 0 1-6 0z"/>',
+    motorsiklo: '<circle cx="5.5" cy="16.5" r="3"/><circle cx="18.5" cy="16.5" r="3"/><path d="M8.5 16.5h6l3-7h-3"/><path d="M5.5 16.5l3-5h5"/><path d="M14 6h3l1.5 3.5"/>',
+    cellphone: '<rect x="7" y="2.5" width="10" height="19" rx="2.2"/><path d="M11 18.5h2"/>',
+    electronics: '<rect x="4" y="4.5" width="16" height="11" rx="1.8"/><path d="M2 19.5h20"/>',
     kasangkapan: '<path d="M5 11V8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3"/><path d="M3 13a2 2 0 0 1 4 0v1h10v-1a2 2 0 0 1 4 0v5H3z"/><path d="M5 18v2M19 18v2"/>',
     trabaho: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/>',
     serbisyo: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L3.5 17.3a1.8 1.8 0 0 0 2.5 2.5l5.8-5.8a4 4 0 0 0 5.2-5.4l-2.6 2.6-2.3-.5-.5-2.3z"/>'
@@ -652,6 +697,7 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
     return '<svg class="' + (cls || "") + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICONS[name] + '</svg>';
   }
   var PIN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>';
+  var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.8l2.3 1.7 2.8-.1.9 2.7 2.3 1.6-.9 2.7.9 2.7-2.3 1.6-.9 2.7-2.8-.1L12 21.2l-2.3-1.7-2.8.1-.9-2.7-2.3-1.6.9-2.7-.9-2.7 2.3-1.6.9-2.7 2.8.1z"/><path d="M8.6 12.2l2.3 2.3 4.5-4.6"/></svg>';
   var HEART = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-9-9.4A4.8 4.8 0 0 1 12 7a4.8 4.8 0 0 1 9 3.6C19.5 15.4 12 20 12 20z"/></svg>';
   var FB = '<svg viewBox="0 0 24 24" fill="#1877F2" aria-hidden="true"><path d="M24 12a12 12 0 1 0-13.9 11.9v-8.4H7.1V12h3V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.2 2.7.2v2.9h-1.5c-1.5 0-2 .9-2 1.9V12h3.4l-.5 3.5h-2.9v8.4A12 12 0 0 0 24 12z"/></svg>';
   var MSG = '<svg viewBox="0 0 24 24" fill="#0084FF" aria-hidden="true"><path d="M12 2C6.4 2 2 6.1 2 11.7c0 2.9 1.2 5.5 3.2 7.2V22l3-1.6c.9.2 1.8.4 2.8.4 5.6 0 10-4.1 10-9.7S17.6 2 12 2zm1 13l-2.5-2.7L5.6 15l5.4-5.7 2.6 2.7 4.8-2.7L13 15z"/></svg>';
@@ -696,6 +742,7 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
     document.documentElement.lang = L.htmlLang;
     document.querySelectorAll("[data-i18n]").forEach(function (el) { el.textContent = L[el.getAttribute("data-i18n")]; });
     document.querySelectorAll("[data-i18n-ph]").forEach(function (el) { el.placeholder = L[el.getAttribute("data-i18n-ph")]; });
+    document.querySelectorAll("[data-deal]").forEach(function (el) { el.textContent = L.deals[el.getAttribute("data-deal")]; });
     document.getElementById("langGroup").setAttribute("aria-label", L.langLabel);
     document.querySelectorAll("[data-lang]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.lang === state.lang)); });
     var sel = document.getElementById("fCat");
@@ -755,6 +802,19 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
     return money.format(it.price) + (unit ? " <small>" + unit + "</small>" : "");
   }
 
+  // Small badges: verified number (set by the database, never by the seller) and "Pwede tawad"
+  function tagsHtml(it, L, full) {
+    var h = "";
+    if (it.verified) h += '<span class="tag ok" title="' + esc(L.verifiedNote) + '">' + CHECK + esc(full ? L.verified : L.verifiedShort) + "</span>";
+    if (it.negotiable) h += '<span class="tag nego">' + esc(L.negotiable) + "</span>";
+    return h ? '<div class="tags">' + h + "</div>" : "";
+  }
+  function dealsHtml(it, L) {
+    var d = (it.deals || []).filter(function (x) { return DEALS.indexOf(x) !== -1; });
+    if (!d.length) return "";
+    return '<p class="deals"><b>' + esc(L.fieldDeals) + ":</b>" + d.map(function (x) { return esc(L.deals[x]); }).join(" · ") + "</p>";
+  }
+
   function renderGrid() {
     var L = t();
     var grid = document.getElementById("grid");
@@ -791,6 +851,7 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
         '<div class="body">' +
           '<div class="price">' + priceHtml(it) + "</div>" +
           '<h3 class="title">' + esc(it.title[state.lang] || it.title.tl) + "</h3>" +
+          tagsHtml(it, L) +
           '<div class="meta"><span class="loc">' + PIN + "<span>" + esc(it.loc) + "</span></span><time datetime=\"" + it.date + "\">" + fmtDate(it.date) + "</time></div>" +
         "</div>" +
       "</article>";
@@ -1016,7 +1077,9 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
         '<div class="price">' + priceHtml(it) + "</div>" +
         '<h3 id="dTitle">' + esc(it.title[state.lang] || it.title.tl) + "</h3>" +
         '<div class="meta"><span class="loc">' + PIN + "<span>" + esc(it.loc) + "</span></span><span>" + esc(L.categories[it.cat]) + "</span><span>" + esc(L.posted_on) + " " + fmtDate(it.date) + "</span></div>" +
+        tagsHtml(it, L, true) +
         '<p class="desc">' + esc(desc || L.noDesc) + "</p>" +
+        dealsHtml(it, L) +
         '<div class="share-row">' +
           '<button type="button" class="btn-share" id="shareBtn">' + SHARE + esc(L.share) + "</button>" +
           '<a class="btn-share" id="shareFb" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(listingUrl(it.id)) + '">' + FB + esc(L.shareFb) + "</a>" +
@@ -1177,7 +1240,9 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
       cat: document.getElementById("fCat").value,
       loc: document.getElementById("fLoc").value.trim(),
       desc: document.getElementById("fDesc").value.trim(),
-      contact: document.getElementById("fContact").value.trim()
+      contact: document.getElementById("fContact").value.trim(),
+      negotiable: document.getElementById("fNego").checked,
+      deals: Array.prototype.map.call(form.querySelectorAll('input[name="deal"]:checked'), function (x) { return x.value; })
     };
     var files = Array.prototype.slice.call(document.getElementById("fPhotos").files || []);
     if (!data.title || isNaN(data.price) || data.price < 0 || !data.loc) {

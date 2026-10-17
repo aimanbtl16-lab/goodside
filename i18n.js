@@ -13,8 +13,12 @@ window.GOODSIDE_I18N = {
     all: "Lahat",
     categories: {
       sasakyan: "Sasakyan",
-      ariarian: "Ari-arian",
+      motorsiklo: "Motorsiklo",
+      cellphone: "Cellphone",
       electronics: "Electronics",
+      ariarian: "Ari-arian",
+      paupahan: "Paupahan",
+      damit: "Damit at ukay",
       kasangkapan: "Kasangkapan",
       trabaho: "Trabaho",
       serbisyo: "Serbisyo"
@@ -135,7 +139,14 @@ window.GOODSIDE_I18N = {
     payWarn: "Dito lang sa page na ito humihingi ng bayad ang Good Side, hindi sa Messenger o text.",
     seePrices: "Lahat ng presyo",
     copy: "Kopyahin",
-    copied: "Nakopya!"
+    copied: "Nakopya!",
+    verified: "Beripikadong numero",
+    verifiedShort: "Beripikado",
+    verifiedNote: "Kumpirmado sa SMS ang numero ng nagbebenta.",
+    negotiable: "Pwede tawad",
+    fieldNegotiable: "Pwede tawad (negotiable)",
+    fieldDeals: "Paano makukuha",
+    deals: { meetup: "Meet-up", cod: "COD (bayad pagdating)", shipping: "Pwedeng ipadala (J&T, LBC, Lalamove)" }
   },
   en: {
     htmlLang: "en",
@@ -149,8 +160,12 @@ window.GOODSIDE_I18N = {
     all: "All",
     categories: {
       sasakyan: "Vehicles",
-      ariarian: "Property",
+      motorsiklo: "Motorcycles",
+      cellphone: "Phones",
       electronics: "Electronics",
+      ariarian: "Property",
+      paupahan: "For rent",
+      damit: "Clothes & ukay",
       kasangkapan: "Home & Furniture",
       trabaho: "Jobs",
       serbisyo: "Services"
@@ -271,6 +286,13 @@ window.GOODSIDE_I18N = {
     payWarn: "Good Side only asks for payment here on this page, never on Messenger or by text.",
     seePrices: "All prices",
     copy: "Copy",
-    copied: "Copied!"
+    copied: "Copied!",
+    verified: "Verified number",
+    verifiedShort: "Verified",
+    verifiedNote: "The seller confirmed their number by SMS.",
+    negotiable: "Negotiable",
+    fieldNegotiable: "Price is negotiable",
+    fieldDeals: "How to get it",
+    deals: { meetup: "Meet-up", cod: "Cash on delivery (COD)", shipping: "Can ship (J&T, LBC, Lalamove)" }
   }
 };

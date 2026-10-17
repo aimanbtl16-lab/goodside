@@ -84,6 +84,12 @@ Un vendeur ne peut pas s'offrir ces options lui-même : la base refuse. Plus tar
 - Chaque annonce a un bouton « I-share » et « I-share sa Facebook ». Le lien ouvre directement l'annonce (adresse se terminant par `#l-42`).
 - `og-image.png` est l'image d'aperçu affichée quand on partage le site. Dans `index.html`, les balises `og:` utilisent `https://www.goodsideph.com/`, le domaine principal.
 
+## Adapté aux Philippines
+
+- **Catégories** : Sasakyan, Motorsiklo, Cellphone, Electronics, Ari-arian, Paupahan (location), Damit at ukay, Kasangkapan, Trabaho, Serbisyo. Pour en ajouter une : la liste `CAT_ORDER` et une icône dans `index.html`, le nom dans `i18n.js` (deux langues), deux couleurs `--c-…` dans chaque thème, et la liste `listings_cat_check` dans la base.
+- **Badge « Beripikado »** : affiché quand le vendeur s'est connecté avec son numéro (code SMS). C'est la base qui le calcule (`phone_verified`), le vendeur ne peut pas le cocher lui-même.
+- **Options d'annonce** : « Pwede tawad » (prix négociable), et comment l'acheteur récupère l'objet : meet-up, COD (paiement à la livraison), envoi par J&T, LBC ou Lalamove.
+
 ## Ce qui a été vérifié
 
 - `schema.sql` exécuté deux fois sur PostgreSQL 16 avec des rôles qui imitent ceux de Supabase. 15 scénarios testés : un compte ne peut pas publier au nom d'un autre, ni se nommer admin, ni lire les numéros de téléphone directement, ni remettre en ligne une annonce masquée ; les photos ne s'écrivent que dans le dossier de leur propriétaire.

@@ -38,7 +38,7 @@ $$;
 create table if not exists public.listings (
   id bigint generated always as identity primary key,
   user_id uuid not null default auth.uid() references auth.users (id) on delete cascade,
-  cat text not null check (cat in ('sasakyan','ariarian','electronics','kasangkapan','trabaho','serbisyo')),
+  cat text not null check (cat in ('sasakyan','motorsiklo','cellphone','electronics','ariarian','paupahan','damit','kasangkapan','trabaho','serbisyo')),
   title text not null check (char_length(title) between 3 and 80),
   description text check (char_length(description) <= 2000),
   price numeric(14,2) not null check (price >= 0),
@@ -49,8 +49,20 @@ create table if not exists public.listings (
   report_count int not null default 0,
   created_at timestamptz not null default now(),
   bumped_at timestamptz not null default now(),   -- I-angat : remonte l'annonce
-  featured_until timestamptz                      -- Tampok : en vedette jusqu'à cette date
+  featured_until timestamptz,                     -- Tampok : en vedette jusqu'à cette date
+  negotiable boolean not null default false,      -- « Pwede tawad » : prix négociable
+  deals text[] not null default '{}' check (deals <@ array['meetup','cod','shipping']::text[]),
+  phone_verified boolean not null default false   -- badge « numéro vérifié », calculé par la base
 );
+-- Pour une base créée avant ces colonnes (migrations goodside_09 et goodside_10)
+alter table public.listings
+  add column if not exists negotiable boolean not null default false,
+  add column if not exists deals text[] not null default '{}' check (deals <@ array['meetup','cod','shipping']::text[]),
+  add column if not exists phone_verified boolean not null default false;
+alter table public.listings drop constraint if exists listings_cat_check;
+alter table public.listings add constraint listings_cat_check check (cat in (
+  'sasakyan','motorsiklo','cellphone','electronics','ariarian','paupahan','damit','kasangkapan','trabaho','serbisyo'
+));
 create index if not exists listings_feed_idx on public.listings (status, bumped_at desc);
 create index if not exists listings_cat_idx on public.listings (cat);
 alter table public.listings enable row level security;
@@ -111,6 +123,19 @@ begin
 end $$;
 create or replace trigger listings_protect before update on public.listings
   for each row execute function public.protect_moderation();
+
+-- Badge « numéro vérifié » : vrai si le compte du vendeur a confirmé son numéro par SMS.
+-- Le nom du trigger le fait passer après listings_protect, qui remet user_id à sa valeur d'origine.
+create or replace function public.set_phone_verified()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  new.phone_verified := exists (
+    select 1 from auth.users u where u.id = new.user_id and u.phone_confirmed_at is not null
+  );
+  return new;
+end $$;
+create or replace trigger listings_verify_phone before insert or update on public.listings
+  for each row execute function public.set_phone_verified();
 
 -- 3. Contact du vendeur : table à part, jamais lisible directement.
 -- Seul get_contact() le donne, et seulement à un visiteur connecté.
