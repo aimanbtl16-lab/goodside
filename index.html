@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Good Side (goodsideph.com): libreng buy and sell sa Pilipinas. Sasakyan, motorsiklo, cellphone, paupahan, ari-arian, ukay, trabaho at serbisyo. Direktang kausapin ang nagbebenta.">
 <link rel="canonical" href="https://www.goodsideph.com/">
+<!-- Installable app (Android « Add to Home screen », iPhone « Sur l'écran d'accueil ») -->
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Good Side">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15211F" media="(prefers-color-scheme: dark)">
 <!-- Pour Google : nom du site dans les résultats, distinct des autres marques « Goodside ». -->
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Good Side PH","alternateName":["Good Side","goodsideph"],"url":"https://www.goodsideph.com/","inLanguage":["fil","en"]}</script>
 <!-- Aperçu Facebook / Messenger / TikTok. Domaine principal du site. -->
@@ -300,7 +307,7 @@ button, input, select { font: inherit; color: inherit; }
 .btn-close svg { width: 18px; height: 18px; }
 #detailDialog { position: fixed; overflow: hidden; }
 #detailDialog .scroll { max-height: calc(100dvh - 48px); overflow-y: auto; }
-textarea { border: 1px solid var(--line); background: var(--bg); border-radius: var(--radius-sm); padding: 10px 12px; width: 100%; resize: vertical; min-height: 72px; }
+textarea { font: inherit; color: inherit; border: 1px solid var(--line); background: var(--bg); border-radius: var(--radius-sm); padding: 10px 12px; width: 100%; resize: vertical; min-height: 72px; }
 textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 .btn-account { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 9px 14px; font-weight: 700; cursor: pointer; white-space: nowrap; }
 .btn-account:hover { border-color: var(--accent); }
@@ -341,6 +348,8 @@ footer .wrap { padding-block: 20px 96px; display: flex; flex-wrap: wrap; justify
 .fb-follow { display: inline-flex; align-items: center; gap: 6px; color: inherit; font-weight: 700; text-decoration: none; }
 .legal-links a, .legal-note a { color: inherit; }
 .fb-follow[hidden] { display: none; }
+.install-app { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); color: inherit; border-radius: 999px; padding: 6px 12px; font: inherit; font-weight: 700; cursor: pointer; }
+.install-app svg { width: 16px; height: 16px; }
 .fb-follow svg { width: 16px; height: 16px; }
 .contact-reveal + .share-row { margin-top: 10px; }
 .made { display: inline-flex; align-items: center; gap: 8px; }
@@ -392,7 +401,15 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
 .btn-fb { display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; border: 0; border-radius: 999px; padding: 12px 18px; background: #1877F2; color: #FFFFFF; font-weight: 700; font-size: 15px; cursor: pointer; }
 .btn-fb:hover { background: #166FE5; }
 .btn-fb svg { width: 20px; height: 20px; flex: none; }
-.btn-fb[disabled], .btn-link.small[disabled] { opacity: .6; cursor: progress; }
+.btn-google { display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; border: 1px solid #747775; border-radius: 999px; padding: 11px 18px; background: #FFFFFF; color: #1F1F1F; font-weight: 700; font-size: 15px; cursor: pointer; }
+.btn-google:hover { background: #F7F8F8; }
+.btn-google svg { width: 20px; height: 20px; flex: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .btn-google { background: #131314; border-color: #8E918F; color: #E3E3E3; }
+  :root:not([data-theme="light"]) .btn-google:hover { background: #1E1F20; }
+}
+:root[data-theme="dark"] .btn-google { background: #131314; border-color: #8E918F; color: #E3E3E3; }
+.btn-fb[disabled], .btn-google[disabled], .btn-link.small[disabled] { opacity: .6; cursor: progress; }
 
 /* Paid options: the seller picks I-angat or Tampok, then sees the GCash steps with a code */
 .boost { border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
@@ -537,6 +554,7 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
     <span data-i18n="madeFor"></span>
   </span>
   <a id="fbPageLink" class="fb-follow" target="_blank" rel="noopener" hidden></a>
+  <button type="button" class="install-app" id="installApp" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span data-i18n="installApp"></span></button>
   <span class="legal-links"><a href="/presyo.html" data-i18n="prices"></a> · <a href="/terms.html" data-i18n="terms"></a> · <a href="/privacy.html" data-i18n="privacy"></a></span>
 </div></footer>
 
@@ -572,7 +590,8 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
       </div>
       <div class="field">
         <label for="fLoc" data-i18n="fieldLocation"></label>
-        <input id="fLoc" data-i18n-ph="fieldLocationPh" maxlength="40">
+        <input id="fLoc" data-i18n-ph="fieldLocationPh" maxlength="40" list="placeList" autocomplete="off">
+        <datalist id="placeList"></datalist>
       </div>
     </div>
     <fieldset class="opts">
@@ -636,6 +655,7 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
     </form>
 
     <div class="or" id="loginOr"><span data-i18n="or"></span></div>
+    <button type="button" class="btn-google" id="googleLogin"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span data-i18n="googleLogin"></span></button>
     <button type="button" class="btn-fb" id="fbLogin"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.5c-1.5 0-1.96.93-1.96 1.89v2.26h3.33l-.53 3.49h-2.8V24C19.62 23.1 24 18.1 24 12.07z"/></svg><span data-i18n="fbLogin"></span></button>
 
     <button type="button" class="btn-link small" id="useEmail" data-i18n="useEmail"></button>
@@ -867,8 +887,11 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
     }).catch(function () { loadState = "error"; renderGrid(); });
   }
 
-  // Login: code by SMS first, then Facebook, email link as a small backup (each can be turned off in config.js)
-  var LOGIN = Object.assign({ phone: false, facebook: false, email: true }, (window.GOODSIDE_CONFIG || {}).login || {});
+  // Login: code by SMS first, then Google and Facebook, email link as a small backup (each can be turned off in config.js)
+  var LOGIN = Object.assign({ phone: false, google: false, facebook: false, email: true }, (window.GOODSIDE_CONFIG || {}).login || {});
+  // Google refuses to log in inside the Facebook / Messenger / TikTok in-app browsers (and other web views): no button there
+  var IN_APP = /FBAN|FBAV|FB_IAB|FB4A|FBIOS|Messenger|Instagram|Line\/|TikTok|musical_ly|Bytedance|; wv\)/i.test(navigator.userAgent);
+  var GOOGLE = LOGIN.google && !IN_APP;
   var loginDlg = document.getElementById("loginDialog");
   var pendingAction = null, loginPhone = "", resendTimer = null;
   function byId(id) { return document.getElementById(id); }
@@ -894,9 +917,10 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
     byId("codeForm").hidden = !LOGIN.phone || step !== "code";
   }
   function resetLogin() {
-    var hasMain = LOGIN.phone || LOGIN.facebook;
+    var hasMain = LOGIN.phone || GOOGLE || LOGIN.facebook;
     showPhoneStep("phone");
-    byId("loginOr").hidden = !(LOGIN.phone && LOGIN.facebook);
+    byId("loginOr").hidden = !(LOGIN.phone && (GOOGLE || LOGIN.facebook));
+    byId("googleLogin").hidden = !GOOGLE; byId("googleLogin").disabled = false;
     byId("fbLogin").hidden = !LOGIN.facebook; byId("fbLogin").disabled = false;
     byId("useEmail").hidden = !(LOGIN.email && hasMain);
     byId("emailForm").hidden = !(LOGIN.email && !hasMain);
@@ -909,7 +933,7 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
     r.textContent = reason || ""; r.hidden = !reason;
     resetLogin();
     openDialog(loginDlg);
-    (LOGIN.phone ? byId("lPhone") : !byId("emailForm").hidden ? byId("lEmail") : byId("fbLogin")).focus();
+    (LOGIN.phone ? byId("lPhone") : !byId("emailForm").hidden ? byId("lEmail") : GOOGLE ? byId("googleLogin") : byId("fbLogin")).focus();
   }
   document.getElementById("accountBtn").addEventListener("click", function () {
     if (api.user()) { api.signOut().then(function () { renderAccount(); load(); }); }
@@ -968,6 +992,10 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
     if (v.length === 6) verifyCode();
   });
 
+  byId("googleLogin").addEventListener("click", function () {
+    var b = this; b.disabled = true; loginMsg();
+    api.signInGoogle().catch(function () { loginMsg(t().googleError); b.disabled = false; });
+  });
   byId("fbLogin").addEventListener("click", function () {
     var b = this; b.disabled = true; loginMsg();
     api.signInFacebook().catch(function () { loginMsg(t().fbError); b.disabled = false; });
@@ -1220,9 +1248,44 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
   // Post dialog
   var dlg = document.getElementById("postDialog");
   var fError = document.getElementById("fError");
+  // Official city / town list (places.js), loaded the first time the form opens, offered as suggestions
+  var placesLoad = null, placeIndex = null;
+  function loadPlaces() {
+    if (placesLoad) return placesLoad;
+    placesLoad = new Promise(function (resolve) {
+      var s = document.createElement("script");
+      s.src = "/places.js"; s.async = true;
+      s.onload = s.onerror = function () { resolve(window.GOODSIDE_PLACES || []); };
+      document.head.appendChild(s);
+    }).then(function (places) {
+      var list = document.getElementById("placeList"), frag = document.createDocumentFragment();
+      places.forEach(function (p) { var o = document.createElement("option"); o.value = p; frag.appendChild(o); });
+      list.appendChild(frag);
+      // "quezon city", "Davao", "Tagaytay" -> the official spelling, when only one place matches
+      placeIndex = {};
+      function add(key, p) { key = key.toLowerCase(); placeIndex[key] = placeIndex[key] && placeIndex[key] !== p ? "?" : p; }
+      places.forEach(function (p) {
+        var name = p.split(",")[0];
+        add(p, p); add(name, p);
+        if (/ City$/.test(name)) add(name.replace(/ City$/, ""), p);
+      });
+      [["qc", "Quezon City, Metro Manila"], ["q.c.", "Quezon City, Metro Manila"], ["cdo", "Cagayan de Oro City, Misamis Oriental"],
+       ["gensan", "General Santos City, South Cotabato"], ["bgc", "Taguig City, Metro Manila"]]
+        .forEach(function (a) { if (places.indexOf(a[1]) >= 0) placeIndex[a[0]] = a[1]; });
+      return places;
+    });
+    return placesLoad;
+  }
+  function officialPlace(v) {
+    var key = String(v || "").trim().replace(/\s+/g, " ").toLowerCase();
+    var p = placeIndex && placeIndex[key];
+    return p && p !== "?" ? p : String(v || "").trim();
+  }
+
   function openPost() {
     if (live() && !api.user()) { requireLogin(t().loginFirst, openPost); return; }
     fError.hidden = true;
+    loadPlaces();
     var u = api.user(), fc = document.getElementById("fContact");
     if (u && u.phone && !fc.value) fc.value = prettyPhone(u.phone).replace("+63 ", "0");
     openDialog(dlg);
@@ -1238,7 +1301,7 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
       price: parseInt(document.getElementById("fPrice").value, 10),
       unit: document.getElementById("fUnit").value,
       cat: document.getElementById("fCat").value,
-      loc: document.getElementById("fLoc").value.trim(),
+      loc: officialPlace(document.getElementById("fLoc").value),
       desc: document.getElementById("fDesc").value.trim(),
       contact: document.getElementById("fContact").value.trim(),
       negotiable: document.getElementById("fNego").checked,
@@ -1273,13 +1336,26 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
     toastTimer = setTimeout(function () { el.hidden = true; }, 2600);
   }
 
+  // Installable app: Android shows « I-install ang app » in the footer; the service worker lets it open without signal
+  var installEvt = null, installBtn = document.getElementById("installApp");
+  window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); installEvt = e; installBtn.hidden = false; });
+  window.addEventListener("appinstalled", function () { installEvt = null; installBtn.hidden = true; });
+  installBtn.addEventListener("click", function () {
+    if (!installEvt) return;
+    installEvt.prompt();
+    installEvt.userChoice.then(function () { installEvt = null; installBtn.hidden = true; });
+  });
+  if ("serviceWorker" in navigator && window.isSecureContext) {
+    window.addEventListener("load", function () { navigator.serviceWorker.register("/sw.js").catch(function () {}); });
+  }
+
   var authError = /[#&?]error_description=/.test(location.hash + location.search);
   renderAll();
   api.init().catch(function () { return null; }).then(function () {
     renderAll();
     api.onAuthChange(authChanged);
     if (authError) {
-      showToast(t().fbError);
+      showToast(t().oauthError);
       try { history.replaceState(null, "", location.pathname); } catch (e) {}
     }
     return refreshAdmin().then(load).then(openFromHash);

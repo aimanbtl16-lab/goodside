@@ -13,6 +13,8 @@ Ce dossier est le vrai site. Sans configuration, il tourne en mode démo avec le
 | `presyo.html` | La page des prix |
 | `robots.txt`, `sitemap.xml` | Pour Google : les pages à visiter. Ajouter ici toute nouvelle page publique |
 | `listings.js` | Les annonces d'exemple du mode démo |
+| `places.js` | La liste officielle des 1 634 villes et communes (PSGC), proposée quand on écrit le lieu d'une annonce |
+| `manifest.webmanifest`, `sw.js`, `icon-*.png`, `apple-touch-icon.png` | L'application installable sur le téléphone |
 | `supabase/schema.sql` | La base de données à créer une seule fois |
 
 > **État au 15 octobre 2026** : le site est en ligne sur https://www.goodsideph.com (domaine acheté chez Gandi, aussi accessible sur https://goodside-kappa.vercel.app ; Vercel, mis à jour automatiquement à chaque envoi sur `main`), branché au projet Supabase « Goodside Projet » (serveur de Singapour, le plus proche des Philippines). Restent l'étape 4 (réglages de connexion) et l'étape 5.
@@ -89,6 +91,10 @@ Un vendeur ne peut pas s'offrir ces options lui-même : la base refuse. Plus tar
 - **Catégories** : Sasakyan, Motorsiklo, Cellphone, Electronics, Ari-arian, Paupahan (location), Damit at ukay, Kasangkapan, Trabaho, Serbisyo. Pour en ajouter une : la liste `CAT_ORDER` et une icône dans `index.html`, le nom dans `i18n.js` (deux langues), deux couleurs `--c-…` dans chaque thème, et la liste `listings_cat_check` dans la base.
 - **Badge « Beripikado »** : affiché quand le vendeur s'est connecté avec son numéro (code SMS). C'est la base qui le calcule (`phone_verified`), le vendeur ne peut pas le cocher lui-même.
 - **Options d'annonce** : « Pwede tawad » (prix négociable), et comment l'acheteur récupère l'objet : meet-up, COD (paiement à la livraison), envoi par J&T, LBC ou Lalamove.
+- **Lieu** : en tapant le lieu, le vendeur voit les villes et communes officielles (`places.js`, « Ville, Province »). « QC », « davao » ou « Tagaytay » sont remplacés par le nom officiel, pour que le filtre par lieu ne mélange pas « QC » et « Quezon City ».
+- **Connexion Google** : presque tous les téléphones Android ont un compte Google. Le bouton apparaît quand `login.google` vaut `true` dans `config.js`, une fois le client Google branché dans Supabase (**Authentication > Sign In / Providers > Google**). Il est caché dans le navigateur interne de Facebook et Messenger, où Google refuse la connexion.
+- **Application installable** : sur Android, un bouton « I-install ang app » apparaît en bas de page ; sur iPhone, Partager puis « Sur l'écran d'accueil ». L'icône est le drapeau Good Side.
+- **Photos plus légères** : réduites à 1 280 px avant l'envoi, pour économiser les données mobiles.
 
 ## Ce qui a été vérifié
 

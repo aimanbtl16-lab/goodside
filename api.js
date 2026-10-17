@@ -36,16 +36,16 @@
     };
   }
 
-  // Shrink phone photos before upload: max 1600 px, JPEG.
+  // Shrink phone photos before upload: max 1280 px, JPEG 0.78 (light on Philippine mobile data, still sharp on a phone).
   function shrink(file) {
     return new Promise(function (resolve) {
       if (!/^image\//.test(file.type) || !window.createImageBitmap) { resolve(file); return; }
       createImageBitmap(file).then(function (bmp) {
-        var scale = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+        var scale = Math.min(1, 1280 / Math.max(bmp.width, bmp.height));
         var c = document.createElement("canvas");
         c.width = Math.round(bmp.width * scale); c.height = Math.round(bmp.height * scale);
         c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
-        c.toBlob(function (blob) { resolve(blob || file); }, "image/jpeg", 0.82);
+        c.toBlob(function (blob) { resolve(blob || file); }, "image/jpeg", 0.78);
       }).catch(function () { resolve(file); });
     });
   }
@@ -207,6 +207,14 @@
         provider: "facebook",
         options: { redirectTo: location.origin + location.pathname }
       }).then(function (res) { if (res.error) throw fail("facebook", res.error); return { ok: true }; });
+    },
+
+    signInGoogle: function () {
+      if (!client) return Promise.resolve({ demo: true });
+      return client.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: location.origin + location.pathname }
+      }).then(function (res) { if (res.error) throw fail("google", res.error); return { ok: true }; });
     },
 
     signIn: function (email) {
