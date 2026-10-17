@@ -8,11 +8,11 @@ window.GOODSIDE_CONFIG = {
   facebookPage: "https://www.facebook.com/share/19mtFn7upC/",
   // Moyens de connexion affichés. phone : code par SMS (Semaphore), caché tant que Semaphore n'a pas validé
   // le nom d'expéditeur GoodSide (sans lui aucun SMS ne part ; remettre true à la validation).
-  // google : bouton Google, caché tant que le client Google n'est pas branché dans Supabase (remettre true à ce moment-là).
-  // Il est aussi caché dans le navigateur interne de Facebook / Messenger, où Google refuse la connexion.
+  // google : bouton Google (client « Good Side site » du projet Google Cloud good-side, branché dans Supabase le 17/10/2026).
+  // Il est caché dans le navigateur interne de Facebook / Messenger, où Google refuse la connexion.
   // facebook : bouton Facebook, caché tant que l'app Meta n'est pas branchée dans Supabase (remettre true à ce moment-là).
   // email : lien par email, en secours (seul moyen affiché tant que les autres sont cachés).
-  login: { phone: false, google: false, facebook: false, email: true },
+  login: { phone: false, google: true, facebook: false, email: true },
   // Options payantes, prix en pesos. bump = I-angat (remonte l'annonce), feature = Tampok (en vedette 7 jours).
   prices: { bump: 49, feature: 149 },
   // Compte GCash qui reçoit les paiements des options. number vide = le bouton « Palakasin » n'apparaît pas.
