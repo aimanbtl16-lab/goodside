@@ -13,6 +13,12 @@ window.GOODSIDE_CONFIG = {
   // facebook : bouton Facebook, caché tant que l'app Meta n'est pas branchée dans Supabase (remettre true à ce moment-là).
   // email : lien par email, en secours (seul moyen affiché tant que les autres sont cachés).
   login: { phone: false, google: true, facebook: false, email: true },
+  // Qui envoie les codes SMS : "firebase" (Google Firebase, sans DTI, 10 SMS gratuits par jour puis ~₱9)
+  // ou "semaphore" (≈ ₱1,10, quand Semaphore aura validé le nom d'expéditeur après le DTI).
+  phoneVia: "firebase",
+  // Configuration web du projet Firebase « Good Side » (Paramètres du projet > Vos applications).
+  // Ces valeurs sont publiques, faites pour être dans le site. Vide = pas de SMS par Google.
+  firebase: null,
   // Options payantes, prix en pesos. bump = I-angat (remonte l'annonce), feature = Tampok (en vedette 7 jours).
   prices: { bump: 49, feature: 149 },
   // Compte GCash qui reçoit les paiements des options. number vide = le bouton « Palakasin » n'apparaît pas.

@@ -369,6 +369,8 @@ dialog {
   background: var(--surface); color: var(--fg); box-shadow: var(--shadow-hover);
 }
 dialog::backdrop { background: rgba(10, 25, 23, .45); }
+/* While an SMS code is being sent by Google, the login box is briefly non-modal so Google's picture check can show above it */
+#loginDialog.relaxed { position: fixed; inset: 0; margin: auto; height: fit-content; max-height: calc(100% - 32px); overflow: auto; z-index: 1000; }
 .modal { padding: 22px; display: flex; flex-direction: column; gap: 14px; }
 .modal h3 { margin: 0; font-family: var(--font-display); font-size: 22px; }
 .field { display: flex; flex-direction: column; gap: 6px; }
@@ -673,6 +675,7 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
     <div class="actions">
       <button type="button" class="btn-ghost" id="cancelLogin" data-i18n="cancel"></button>
     </div>
+    <div id="recaptchaBox"></div>
   </div>
 </dialog>
 
@@ -932,6 +935,8 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
     var r = byId("loginReason");
     r.textContent = reason || ""; r.hidden = !reason;
     resetLogin();
+    if (LOGIN.phone && api.preparePhone) api.preparePhone();
+    loginDlg.classList.remove("relaxed");
     openDialog(loginDlg);
     (LOGIN.phone ? byId("lPhone") : !byId("emailForm").hidden ? byId("lEmail") : GOOGLE ? byId("googleLogin") : byId("fbLogin")).focus();
   }
@@ -940,7 +945,23 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
     else requireLogin();
   });
   document.getElementById("cancelLogin").addEventListener("click", function () { loginDlg.close(); });
-  loginDlg.addEventListener("close", function () { clearInterval(resendTimer); });
+  loginDlg.addEventListener("close", function () {
+    if (skipClose) { skipClose--; return; }
+    clearInterval(resendTimer);
+  });
+  // Google's anti-robot check (reCAPTCHA) may show a picture puzzle above the page. A modal box would
+  // cover it and block it, so the login box turns into a normal box while the code is being sent.
+  var skipClose = 0;
+  function setLoginModal(modal) {
+    if (!loginDlg.showModal || !loginDlg.open) return;
+    var isModal;
+    try { isModal = loginDlg.matches(":modal"); } catch (e) { return; }
+    if (isModal === modal) return;
+    skipClose++;
+    loginDlg.close();
+    loginDlg.classList.toggle("relaxed", !modal);
+    if (modal) loginDlg.showModal(); else loginDlg.show();
+  }
 
   function startResendTimer() {
     var left = 60, b = byId("resendCode");
@@ -954,7 +975,15 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
   }
   function sendCode(phone, btn) {
     btn.disabled = true; loginMsg();
-    return api.sendPhoneCode(phone).then(function () {
+    var relax = api.phoneUsesRecaptcha && api.phoneUsesRecaptcha();
+    if (relax) setLoginModal(false);
+    return api.sendPhoneCode(phone).then(function (res) {
+      if (relax) setLoginModal(true);
+      return res;
+    }, function (err) {
+      if (relax) setLoginModal(true);
+      throw err;
+    }).then(function () {
       loginPhone = phone;
       byId("codeSentTo").textContent = t().codeSentTo.replace("{n}", prettyPhone(phone));
       byId("lCode").value = "";
@@ -981,7 +1010,10 @@ dialog::backdrop { background: rgba(10, 25, 23, .45); }
     verifying = true; loginMsg();
     var btn = byId("verifyCode"); btn.disabled = true;
     api.verifyPhoneCode(loginPhone, code)
-      .catch(function (err) { loginMsg(err.code === "rate" ? t().tooMany : t().badCode); byId("lCode").select(); })
+      .catch(function (err) {
+        loginMsg(err.code === "rate" ? t().tooMany : err.code === "login" ? t().loginFail : t().badCode);
+        byId("lCode").select();
+      })
       .then(function () { btn.disabled = false; verifying = false; });
   }
   byId("codeForm").addEventListener("submit", function (e) { e.preventDefault(); verifyCode(); });

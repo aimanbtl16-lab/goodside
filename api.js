@@ -54,6 +54,79 @@
     var e = new Error(code); e.code = code; e.cause = err; return e;
   }
 
+  // ---- SMS codes sent by Google (Firebase phone sign-in) ----
+  // Google sends the SMS under its own approved sender names, so no Philippine sender name is needed.
+  // The scripts load only when someone signs in by phone (light on mobile data).
+  var FIREBASE_SDK = "https://www.gstatic.com/firebasejs/10.14.1/";
+  var fbAuth = null, fbConfirm = null, fbVerifier = null;
+  function viaFirebase() { return cfg.phoneVia === "firebase" && !!(cfg.firebase && cfg.firebase.apiKey); }
+  function loadScript(src) {
+    return new Promise(function (resolve, reject) {
+      var s = document.createElement("script");
+      s.src = src; s.async = true; s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+  function loadFirebase() {
+    if (!fbAuth) {
+      fbAuth = loadScript(FIREBASE_SDK + "firebase-app-compat.js")
+        .then(function () { return loadScript(FIREBASE_SDK + "firebase-auth-compat.js"); })
+        .then(function () {
+          var fb = window.firebase;
+          var app = fb.apps.length ? fb.app() : fb.initializeApp(cfg.firebase);
+          var auth = app.auth();
+          auth.useDeviceLanguage();
+          // Google only proves the number; the Good Side session lives in Supabase, so Google keeps nothing.
+          return auth.setPersistence(fb.auth.Auth.Persistence.NONE).then(function () { return auth; });
+        });
+      fbAuth.catch(function () { fbAuth = null; });
+    }
+    return fbAuth;
+  }
+  function firebaseErr(err) {
+    var c = (err && err.code) || "";
+    if (c === "auth/too-many-requests" || c === "auth/quota-exceeded") return "rate";
+    if (c === "auth/invalid-verification-code" || c === "auth/code-expired" || c === "auth/missing-verification-code") return "code";
+    return "";
+  }
+  function firebaseSend(phone) {
+    return loadFirebase().then(function (auth) {
+      if (fbVerifier) { try { fbVerifier.clear(); } catch (e) { /* already gone */ } fbVerifier = null; }
+      // A fresh spot for the invisible reCAPTCHA each time (a used one cannot be reused).
+      var box = document.getElementById("recaptchaBox");
+      if (!box) { box = document.createElement("div"); box.id = "recaptchaBox"; document.body.appendChild(box); }
+      box.innerHTML = "";
+      var spot = document.createElement("div");
+      box.appendChild(spot);
+      fbVerifier = new window.firebase.auth.RecaptchaVerifier(spot, { size: "invisible" }, auth.app);
+      return auth.signInWithPhoneNumber(phone, fbVerifier);
+    }).then(function (confirmation) {
+      fbConfirm = confirmation;
+      return { ok: true };
+    }, function (err) {
+      throw fail(firebaseErr(err) === "rate" ? "rate" : "sms", err);
+    });
+  }
+  function firebaseVerify(code) {
+    if (!fbConfirm) return Promise.reject(fail("code", new Error("no code sent yet")));
+    return fbConfirm.confirm(code).then(function (cred) {
+      return cred.user.getIdToken();
+    }, function (err) {
+      throw fail(firebaseErr(err) || "login", err);
+    }).then(function (idToken) {
+      return client.functions.invoke("firebase-phone-login", { body: { idToken: idToken } }).then(function (res) {
+        var s = res.data;
+        if (res.error || !s || !s.access_token || !s.refresh_token) throw fail("login", res.error || new Error("no session"));
+        return client.auth.setSession({ access_token: s.access_token, refresh_token: s.refresh_token });
+      });
+    }).then(function (res) {
+      if (res.error) throw fail("login", res.error);
+      fbConfirm = null;
+      loadFirebase().then(function (auth) { return auth.signOut(); }).catch(function () {});
+      return { ok: true };
+    });
+  }
+
   var api = {
     mode: "demo",
 
@@ -184,9 +257,19 @@
       });
     },
 
-    // Phone login: Supabase texts a 6-digit code (Send SMS hook -> Semaphore), then the code is checked
+    // Phone login: a 6-digit code by SMS, sent one of two ways (config.js phoneVia):
+    // "firebase": Google Firebase sends and checks the code, then the Supabase function
+    //   firebase-phone-login swaps Google's proof for a Good Side session (see firebaseSend/Verify below).
+    // "semaphore": Supabase texts the code itself (Send SMS hook -> Semaphore) and checks it.
+    // True when Google's anti-robot check (reCAPTCHA) may need room on screen while the code is sent.
+    phoneUsesRecaptcha: function () { return !!(client && viaFirebase()); },
+
+    // Starts loading Google's login scripts early, as soon as the login box opens.
+    preparePhone: function () { if (client && viaFirebase()) loadFirebase().catch(function () {}); },
+
     sendPhoneCode: function (phone) {
       if (!client) return Promise.resolve({ demo: true });
+      if (viaFirebase()) return firebaseSend(phone);
       return client.auth.signInWithOtp({ phone: phone }).then(function (res) {
         if (res.error) throw fail(res.error.status === 429 ? "rate" : "sms", res.error);
         return { ok: true };
@@ -195,6 +278,7 @@
 
     verifyPhoneCode: function (phone, code) {
       if (!client) return Promise.resolve({ demo: true });
+      if (viaFirebase()) return firebaseVerify(code);
       return client.auth.verifyOtp({ phone: phone, token: code, type: "sms" }).then(function (res) {
         if (res.error) throw fail(res.error.status === 429 ? "rate" : "code", res.error);
         return { ok: true };
